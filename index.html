@@ -1,1391 +1,905 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="light only">
-<meta name="theme-color" content="#FFFCF8">
-<title>Naturalmente Vela · Guía Interactiva</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Libre+Franklin:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    color-scheme: light only;
-    --bg:#F1EBDD;
-    --card:#FBF8F1;
-    --accent:#8C3B4A;
-    --accent-deep:#5E2530;
-    --accent-bg:#F0DEDD;
-    --ink:#2B2622;
-    --ink-soft:#6B6153;
-    --line:#DCD1B8;
-    --good:#5F7A5E;
-    --good-bg:#E1E8DC;
-    --warn:#B9812E;
-    --warn-bg:#F1E3C4;
-    --shadow: 0 2px 10px rgba(43,38,34,0.08);
-    --radius:12px;
-    --font-display:'Yeseva One', Georgia, serif;
-    --font-body:'Libre Franklin', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-mono:'Space Mono', 'Courier New', monospace;
-  }
-  *{box-sizing:border-box;}
-  html, body{
-    background:var(--bg) !important;
-    color:var(--ink) !important;
-  }
-  html{ height:100%; }
-  body{
-    margin:0; min-height:100%;
-    font-family:var(--font-body);
-    -webkit-font-smoothing:antialiased;
-    transition: background-color .35s ease;
-    background-image:
-      radial-gradient(rgba(43,38,34,0.035) 1px, transparent 1px);
-    background-size: 3px 3px;
-  }
-  h1,h2,h3{ font-family:var(--font-display); font-weight:400; color:var(--accent-deep); margin:0; letter-spacing:.01em; }
-  p{ margin:0; color:var(--ink-soft); line-height:1.6; }
-  button{ font-family:inherit; }
-  ::selection{ background:var(--accent-bg); }
-  .mono{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
-
-  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
-
-  /* ---------- App shell ---------- */
-  .app{ max-width:900px; margin:0 auto; padding:0 1.1rem 3rem 1.1rem; min-height:100vh; }
-  .topbar{
-    position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between;
-    padding:1.1rem 0; background:var(--bg); border-bottom:1px solid var(--line);
-  }
-  .brand{ display:flex; align-items:center; gap:.65rem; }
-  .brand .badge{
-    width:36px; height:36px; border-radius:46% 54% 58% 42% / 45% 42% 58% 55%;
-    background:radial-gradient(circle at 32% 28%, #B5586B 0%, var(--accent) 55%, var(--accent-deep) 100%);
-    display:flex; align-items:center; justify-content:center; font-size:1.05rem;
-    box-shadow: inset 0 -2px 3px rgba(0,0,0,0.18), inset 0 2px 2px rgba(255,255,255,0.25);
-  }
-  .brand b{ font-family:var(--font-display); font-weight:400; font-size:1.25rem; color:var(--accent-deep); letter-spacing:.01em; }
-  .brand span{ display:block; font-size:.66rem; color:var(--ink-soft); letter-spacing:.05em; font-family:var(--font-mono); }
-  #homeBtn{
-    display:none; align-items:center; gap:.4rem; background:var(--card); border:1px solid var(--line);
-    color:var(--accent-deep); font-weight:600; font-size:.8rem; padding:.5rem .9rem; border-radius:8px;
-    cursor:pointer;
-  }
-  #homeBtn:hover{ border-color:var(--accent); }
-  #homeBtn.show{ display:inline-flex; }
-
-  /* ---------- Home grid ---------- */
-  #home{ animation:fadeIn .25s ease; }
-  .home-head{ padding:1.3rem 0 1.5rem 0; }
-  .home-head h1{ font-size:1.9rem; line-height:1.2; font-weight:400; }
-  .home-head p{ margin-top:.5rem; font-size:.92rem; max-width:46ch; }
-  .grid{
-    display:grid; grid-template-columns:repeat(3,1fr); gap:.7rem;
-  }
-  @media (max-width:680px){ .grid{ grid-template-columns:repeat(2,1fr);} }
-  .tile{
-    background:var(--card); border:1px solid var(--line); border-radius:10px; padding:1.1rem .95rem;
-    text-align:left; cursor:pointer; box-shadow:none; transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease;
-    display:flex; flex-direction:column; gap:.6rem; min-height:120px;
-  }
-  .tile:hover{ transform:translateY(-2px); border-color:var(--accent); box-shadow:var(--shadow); }
-  .tile .ic{
-    font-size:1.15rem; width:2.5rem; height:2.5rem;
-    border-radius:44% 56% 61% 39% / 48% 41% 59% 52%;
-    display:flex; align-items:center; justify-content:center;
-    box-shadow: inset 0 -2px 3px rgba(0,0,0,0.14), inset 0 2px 2px rgba(255,255,255,0.3);
-  }
-  .tile b{ font-size:.87rem; color:var(--ink); font-weight:600; line-height:1.25; }
-  .tile small{ font-size:.71rem; color:var(--ink-soft); line-height:1.3; font-family:var(--font-mono); letter-spacing:-.01em; }
-
-  /* ---------- Panel ---------- */
-  #panel{ display:none; animation:fadeIn .25s ease; }
-  #panel.show{ display:block; }
-  #home.hide{ display:none; }
-  .panel-head{ margin-bottom:1.3rem; padding-bottom:1rem; border-bottom:1px dashed var(--line); }
-  .panel-head .eyebrow{
-    font-family:var(--font-mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
-    color:var(--accent); font-weight:700;
-  }
-  .panel-head h2{ font-size:1.7rem; margin-top:.3rem; }
-  .panel-head p{ margin-top:.5rem; font-size:.9rem; }
-  @keyframes fadeIn{ from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:none;} }
-
-  .card{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:1.15rem 1.2rem; }
-  .card + .card{ margin-top:.8rem; }
-
-  /* ---------- Chip selector ---------- */
-  .chips{ display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1rem; }
-  .chip{
-    background:var(--card); border:1.5px solid var(--line); color:var(--ink); font-weight:600; font-size:.83rem;
-    padding:.48rem .9rem; border-radius:7px; cursor:pointer; transition:all .12s ease;
-  }
-  .chip:hover{ border-color:var(--accent); }
-  .chip.active{ background:var(--accent); border-color:var(--accent); color:#FBF8F1; }
-
-  /* ---------- Action buttons (distinct from selection chips) ---------- */
-  .btn{
-    display:inline-block; background:var(--ink); color:var(--card); font-family:var(--font-mono);
-    text-transform:uppercase; letter-spacing:.04em; font-size:.76rem; font-weight:700;
-    padding:.75rem 1.3rem; border-radius:6px; border:none; cursor:pointer; text-decoration:none;
-    transition:transform .12s ease, background .12s ease;
-  }
-  .btn:hover{ background:var(--accent-deep); transform:translateY(-1px); }
-  .btn-primary{
-    background:var(--accent); color:#FBF8F1; font-size:.85rem; padding:.9rem 1.7rem; border-radius:8px;
-  }
-  .btn-primary:hover{ background:var(--accent-deep); }
-
-  .result-card{
-    background:var(--accent-bg); border:1px solid var(--line);
-    border-radius:10px; padding:1.25rem 1.3rem; animation:fadeIn .2s ease;
-    border-left:3px solid var(--accent);
-  }
-  .result-card h3{ font-size:1.15rem; font-family:var(--font-display); font-weight:400; }
-  .result-tags{ display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.6rem; }
-  .result-tags span{
-    background:var(--card); color:var(--accent-deep); font-size:.7rem; font-weight:700; font-family:var(--font-mono);
-    padding:.26rem .55rem; border-radius:5px; border:1px solid var(--line);
-  }
-  .result-card ul{ margin:.7rem 0 0 0; padding-left:1.1rem; }
-  .result-card li{ font-size:.87rem; color:var(--ink-soft); margin-bottom:.3rem; line-height:1.5; }
-
-  /* ---------- Recipe tool ---------- */
-  .recipe-meta{ display:flex; gap:.4rem; flex-wrap:wrap; margin:.5rem 0 1rem 0; }
-  .recipe-meta span{ background:var(--accent-bg); color:var(--accent-deep); font-size:.68rem; font-weight:700; font-family:var(--font-mono); padding:.26rem .55rem; border-radius:5px; }
-  .cols2{ display:grid; grid-template-columns:1fr 1.3fr; gap:1.2rem; }
-  @media (max-width:640px){ .cols2{ grid-template-columns:1fr; } }
-  .cols2 h4{ font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); margin-bottom:.6rem; }
-
-  /* ---------- Checklist / steps (shared) ---------- */
-  .check-item{ display:flex; align-items:flex-start; gap:.55rem; padding:.32rem 0; cursor:pointer; }
-  .check-item input{ margin-top:.24rem; accent-color:var(--accent); width:15px; height:15px; flex:none; }
-  .check-item span{ font-size:.87rem; color:var(--ink); }
-  .check-item.done span{ color:#b7a89c; text-decoration:line-through; }
-  .bar-track{ height:6px; background:var(--accent-bg); border-radius:999px; overflow:hidden; margin-top:.6rem; }
-  .bar-fill{ height:100%; background:var(--accent); width:0%; transition:width .3s; border-radius:999px; }
-  .count-pill{ font-size:.72rem; color:var(--ink-soft); }
-
-  .steps{ counter-reset:step; }
-  .step{ position:relative; padding:.55rem 0 .55rem 2.2rem; border-bottom:1px dashed var(--line); cursor:pointer; }
-  .step:last-child{ border-bottom:none; }
-  .step::before{
-    counter-increment:step; content:counter(step);
-    position:absolute; left:0; top:.45rem; width:1.45rem; height:1.45rem; border-radius:50%;
-    background:var(--accent); color:#fff; font-size:.72rem; display:flex; align-items:center; justify-content:center; font-weight:600;
-  }
-  .step.done::before{ content:'✓'; background:var(--good); }
-  .step span{ font-size:.86rem; color:var(--ink); }
-  .step.done span{ color:#b0a297; text-decoration:line-through; }
-
-  .tip-box{
-    margin-top:1rem; background:var(--warn-bg); border-left:3px solid var(--accent); border-radius:0 12px 12px 0;
-    padding:.8rem 1rem; font-size:.85rem; color:#6b4a2e;
-  }
-
-  /* ---------- Syllabus accordion ---------- */
-  details.acc{
-    background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:.5rem; overflow:hidden;
-  }
-  details.acc summary{
-    list-style:none; cursor:pointer; padding:.75rem .9rem; font-weight:600; color:var(--ink); font-size:.85rem;
-    display:flex; align-items:center; justify-content:space-between; gap:1rem;
-  }
-  details.acc summary::-webkit-details-marker{ display:none; }
-  details.acc summary::after{ content:'+'; font-size:1.1rem; color:var(--accent); flex:none; transition:transform .2s; }
-  details.acc[open] summary::after{ transform:rotate(45deg); }
-  details.acc .acc-body{ padding:0 .9rem .85rem .9rem; }
-  details.acc .acc-body ul{ margin:0; padding-left:1.1rem; }
-  details.acc .acc-body li{ font-size:.82rem; color:var(--ink-soft); margin-bottom:.3rem; line-height:1.5; }
-
-  .signs-grid{ display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin-top:.9rem; }
-  @media (max-width:520px){ .signs-grid{ grid-template-columns:1fr; } }
-  .signs-box{ border-radius:12px; padding:.8rem .9rem; font-size:.82rem; }
-  .signs-box.good{ background:var(--good-bg); color:#3f6b3d; }
-  .signs-box.bad{ background:var(--warn-bg); color:#8a5a1e; }
-  .signs-box b{ display:block; margin-bottom:.4rem; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; }
-  .signs-box ul{ margin:0; padding-left:1.1rem; }
-  .signs-box li{ margin-bottom:.3rem; line-height:1.4; }
-
-  /* ---------- Diagnóstico ---------- */
-  .symptom-list{ display:flex; flex-direction:column; gap:.5rem; }
-  .symptom-btn{
-    text-align:left; background:var(--card); border:1.5px solid var(--line); border-radius:10px; padding:.75rem .9rem;
-    cursor:pointer; font-weight:600; font-size:.87rem; color:var(--ink); transition:all .12s ease;
-  }
-  .symptom-btn:hover{ border-color:var(--accent); }
-
-  /* ---------- Beginner route list ---------- */
-  .route-list{ display:flex; flex-direction:column; gap:.6rem; }
-  .route-item{
-    display:flex; align-items:center; gap:.8rem; background:var(--bg); border:1.5px solid var(--line);
-    border-radius:12px; padding:.7rem .9rem; cursor:pointer; transition:all .15s; text-align:left;
-  }
-  .route-item:hover{ border-color:var(--accent); transform:translateX(2px); }
-  .route-item .num{
-    flex:none; width:1.7rem; height:1.7rem; border-radius:50%; background:var(--accent); color:#fff;
-    display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700;
-  }
-  .route-item .txt b{ display:block; font-size:.85rem; color:var(--ink); }
-  .route-item .txt span{ font-size:.74rem; color:var(--ink-soft); }
-  .route-item .arrow{ margin-left:auto; color:var(--accent); font-size:1rem; }
-  .symptom-btn.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
-  .diag-answer{ margin-top:.9rem; }
-  .diag-answer .row{ display:flex; gap:.6rem; margin-bottom:.6rem; align-items:flex-start; }
-  .diag-answer .tagline{
-    flex:none; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
-    padding:.25rem .55rem; border-radius:6px; white-space:nowrap; margin-top:.1rem;
-  }
-  .tagline.cause{ background:var(--warn-bg); color:#9a5a1e; }
-  .tagline.sol{ background:var(--good-bg); color:#3f6b3d; }
-  .diag-answer p{ font-size:.88rem; color:var(--ink); }
-
-  /* ---------- Calculator ---------- */
-  .calc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
-  @media (max-width:480px){ .calc-grid{ grid-template-columns:1fr; } }
-  .field label{ font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); display:block; margin-bottom:.35rem; font-weight:600; }
-  .field input{
-    width:100%; padding:.6rem .8rem; border:1.5px solid var(--line); border-radius:8px; font-size:1rem;
-    font-family:var(--font-mono); background:var(--card); color:var(--ink);
-  }
-  .field input:focus{ outline:none; border-color:var(--accent); }
-  .calc-out{
-    margin-top:1.1rem; background:var(--accent); color:#FBF8F1; border-radius:10px; padding:1.1rem 1.3rem;
-    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.6rem;
-  }
-  .calc-out .box span{ display:block; font-size:.66rem; text-transform:uppercase; letter-spacing:.06em; opacity:.8; font-family:var(--font-mono); }
-  .calc-out .box b{ font-family:var(--font-mono); font-size:1.5rem; color:#FBF8F1; font-weight:700; }
-
-  /* ---------- Glossary ---------- */
-  .search-wrap{ position:relative; margin-bottom:1rem; }
-  .search-wrap input{
-    width:100%; padding:.65rem 1rem; border:1.5px solid var(--line); border-radius:8px; font-size:.9rem;
-    font-family:var(--font-body); background:var(--card); color:var(--ink);
-  }
-  .search-wrap input:focus{ outline:none; border-color:var(--accent); }
-  .gterm{ padding:.65rem 0; border-bottom:1px dashed var(--line); }
-  .gterm:last-child{ border-bottom:none; }
-  .gterm b{ color:var(--accent-deep); font-size:.9rem; }
-  .gterm p{ margin-top:.15rem; font-size:.84rem; }
-
-  /* ---------- Wick calculator result ---------- */
-  .wick-visual{ display:flex; align-items:center; gap:1rem; margin-top:1rem; }
-  .wick-jar{ width:60px; height:70px; border:3px solid var(--accent); border-top:none; border-radius:0 0 10px 10px; position:relative; flex:none; }
-  .wick-jar::before{ content:''; position:absolute; left:50%; top:-14px; width:var(--wickw,2px); height:16px; background:#5c4433; transform:translateX(-50%); }
-
-  footer.app-foot{ text-align:center; padding:2.6rem 0 1.2rem 0; color:var(--ink-soft); font-size:.72rem; font-family:var(--font-mono); letter-spacing:.03em; }
-  footer.app-foot .copyright{
-    margin-top:.6rem; font-size:.64rem; line-height:1.6; color:#9a8f7f; letter-spacing:.01em;
-    max-width:38ch; margin-left:auto; margin-right:auto;
-  }
-
-  .wa-float{
-    position:fixed; bottom:1.1rem; right:1.1rem; z-index:100;
-    display:flex; align-items:center; gap:.5rem;
-    background:var(--card); color:#2B6156; text-decoration:none; font-weight:600; font-size:.82rem;
-    padding:.7rem 1.05rem; border-radius:999px; border:1.5px solid #BFDCCF;
-    transition:transform .12s ease, border-color .12s ease;
-  }
-  .wa-float:hover{ transform:translateY(-2px); border-color:#4FAF8C; }
-  .wa-ic{ font-size:1rem; }
-  @media (max-width:520px){
-    .wa-float span:last-child{ display:none; }
-    .wa-float{ padding:.85rem; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tu Botiquín Emocional — guía completa de velas terapéuticas y aromaterapia para ansiedad, miedo e insomnio">
+    <meta property="og:title" content="Tu Botiquín Emocional - Velas Terapéuticas">
+    <meta property="og:description" content="Recupera la calma con velas y aromas. Guía práctica para ansiedad, miedo e insomnio.">
+    <meta property="og:type" content="website">
+    <title>Tu Botiquín Emocional — Velas Terapéuticas & Aromaterapia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fafaf8;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header / Hero */
+        header {
+            background: linear-gradient(135deg, #f4e4d7 0%, #f9f3ef 100%);
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8d9ce;
+        }
+        
+        .hero-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #8b6f47;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            color: #2d2d2d;
+            line-height: 1.3;
+        }
+        
+        h1 em {
+            font-style: italic;
+            color: #c17a5a;
+            font-weight: 500;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-primary {
+            display: inline-block;
+            background: #c17a5a;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1em;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .cta-primary:hover {
+            background: #a86649;
+        }
+        
+        .trust-badges {
+            margin-top: 25px;
+            font-size: 0.95em;
+            color: #666;
+        }
+        
+        .trust-badges span {
+            display: inline-block;
+            margin: 0 10px;
+        }
+        
+        .star-rating {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        /* Hero image placeholder */
+        .hero-image {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .hero-image-placeholder {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background: linear-gradient(135deg, #f0d5c3 0%, #e8c9b8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+            margin: 0 auto;
+        }
+        
+        /* Main content sections */
+        section {
+            padding: 50px 20px;
+            border-bottom: 1px solid #e8d9ce;
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            color: #2d2d2d;
+            text-align: center;
+        }
+        
+        h2 em {
+            font-style: italic;
+            color: #c17a5a;
+            font-weight: 500;
+        }
+        
+        h3 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #2d2d2d;
+        }
+        
+        h4 {
+            font-size: 1em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        /* Problem section */
+        .problems {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 600px) {
+            .problems {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .problem-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #c17a5a;
+        }
+        
+        .problem-item strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d2d2d;
+        }
+        
+        /* Features / What's inside */
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 600px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .feature {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border-top: 4px solid #c17a5a;
+        }
+        
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        
+        /* Pricing section */
+        .pricing-section {
+            background: linear-gradient(135deg, #fff5f0 0%, #fffbf9 100%);
+            text-align: center;
+        }
+        
+        .pricing-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .price-label {
+            font-size: 0.9em;
+            color: #999;
+            text-decoration: line-through;
+            margin-bottom: 10px;
+        }
+        
+        .price-old {
+            font-size: 1.3em;
+            color: #999;
+            margin-right: 15px;
+        }
+        
+        .discount-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .price-current {
+            font-size: 3em;
+            font-weight: bold;
+            color: #c17a5a;
+            margin: 15px 0;
+        }
+        
+        .price-currency {
+            font-size: 0.6em;
+            vertical-align: super;
+        }
+        
+        .urgency-notice {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            color: #856404;
+        }
+        
+        .countdown {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        /* Guarantee section */
+        .guarantee {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px solid #c17a5a;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .guarantee-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .testimonials {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .testimonial {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #c17a5a;
+        }
+        
+        .testimonial-name {
+            font-weight: bold;
+            color: #2d2d2d;
+            margin-top: 15px;
+        }
+        
+        .testimonial-role {
+            font-size: 0.9em;
+            color: #999;
+        }
+        
+        /* FAQ */
+        .faq-item {
+            background: white;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e8d9ce;
+        }
+        
+        .faq-question {
+            padding: 18px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9f3ef;
+            transition: background 0.2s;
+        }
+        
+        .faq-question:hover {
+            background: #f0e8df;
+        }
+        
+        .faq-toggle {
+            font-weight: bold;
+            color: #c17a5a;
+            font-size: 1.2em;
+        }
+        
+        .faq-answer {
+            display: none;
+            padding: 20px 18px;
+            color: #666;
+            border-top: 1px solid #e8d9ce;
+        }
+        
+        .faq-answer.active {
+            display: block;
+        }
+        
+        /* CTA button styles */
+        .cta-secondary {
+            display: inline-block;
+            background: #c17a5a;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .cta-secondary:hover {
+            background: #a86649;
+        }
+        
+        /* Footer */
+        footer {
+            background: #2d2d2d;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 0.9em;
+        }
+        
+        footer a {
+            color: #c17a5a;
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer-links {
+            margin-top: 15px;
+        }
+        
+        .footer-links a {
+            margin: 0 15px;
+        }
+        
+        /* Accessibility & refinements */
+        .highlight {
+            font-weight: 600;
+            color: #c17a5a;
+        }
+        
+        .list-icon {
+            color: #c17a5a;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+    </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <div class="brand">
-      <div class="badge">🕯️</div>
-      <div><b>Naturalmente Vela</b><span>Guía interactiva</span></div>
+
+<!-- HERO / HEADER -->
+<header>
+    <div class="container">
+        <div class="hero-label">✨ Guía Completa de Velas & Aromaterapia</div>
+        <h1>Antes dormías tranquilo, ahora la ansiedad no te deja descansar. <em>Recuperar la calma es posible.</em></h1>
+        
+        <p class="hero-subtitle">Guía práctica para usar velas terapéuticas y aromas que calman ansiedad, miedo e insomnio — sin medicinas, sin esperas.</p>
+        
+        <a href="#oferta" class="cta-primary">Quiero Mi Botiquín Emocional →</a>
+        
+        <div class="trust-badges">
+            <span><span class="star-rating">★★★★★ 4.8/5</span> — avalado por terapeutas</span>
+            <span>🛡 Garantía 60 Días</span>
+        </div>
+        
+        <div class="hero-image">
+            <div class="hero-image-placeholder">
+                [IMAGEN: Botiquín de velas terapéuticas + aceites esenciales]
+            </div>
+        </div>
     </div>
-    <button id="homeBtn" onclick="goHome()">← Inicio</button>
-  </div>
+</header>
 
-  <div id="home">
-    <div class="home-head">
-      <h1>¿Qué necesitas resolver hoy?</h1>
-      <p>¿Primera vez aquí? Toca "👋 Empieza aquí" abajo. Si ya conoces la app, ve directo al módulo que necesites.</p>
+<!-- PROBLEM SECTION -->
+<section class="container">
+    <h2>¿Te reconocés en esto?</h2>
+    <p style="text-align: center; font-size: 1.05em; color: #666; margin-bottom: 30px;">
+        La ansiedad, el miedo nocturno y el insomnio no te dejan vivir. Pero nadie te dio el plan.
+    </p>
+    
+    <div class="problems">
+        <div class="problem-item">
+            <strong>😩 Te dieron diagnóstico, pero no la solución</strong>
+            <p>Ansiedad, insomnio o miedo — y ahora buscas en Google qué te va a calmar, sin saber realmente qué funciona.</p>
+        </div>
+        
+        <div class="problem-item">
+            <strong>💊 No querés depender de pastillas para dormir</strong>
+            <p>Hay tratamientos, sí — pero todos con efectos secundarios. Buscas algo natural que realmente funcione.</p>
+        </div>
+        
+        <div class="problem-item">
+            <strong>3⃣ Probaste aceites, velas, lo que fuera — pero sin técnica</strong>
+            <p>Compraste aromas caros, pero no sabías cómo usarlos. Sin método, la mayoría de la gente no ve resultados.</p>
+        </div>
+        
+        <div class="problem-item">
+            <strong>🌙 Las noches son lo peor</strong>
+            <p>Te dormís pensando en lo que puede pasar. Despiertas a las 3 am. Te cuesta horas volver a dormirte — y el día siguiente estás hecho mierda.</p>
+        </div>
+        
+        <div class="problem-item">
+            <strong>💸 Ya gastaste en terapias, apps de meditación, suplementos</strong>
+            <p>Probaste de todo — pero nadie te dio una estrategia de aromas y velas real, que combines en casa sin experimetación.</p>
+        </div>
+        
+        <div class="problem-item">
+            <strong>😴 No sabés qué aroma es para qué</strong>
+            <p>¿Lavanda para dormir? ¿Menta para ansiedad? ¿Cedro para miedo? Probá, probá — pero sin guía, es suerte.</p>
+        </div>
     </div>
-    <div class="grid" id="tileGrid"></div>
-  </div>
+</section>
 
-  <div id="panel"></div>
+<!-- SOLUTION SECTION -->
+<section class="container" style="background: #f9f3ef;">
+    <h2>Por fin, la solución que te faltaba</h2>
+    
+    <h3 style="text-align: center; color: #666; font-weight: 400; margin-bottom: 30px;">
+        Te presentamos: <span class="highlight">Tu Botiquín Emocional</span>
+    </h3>
+    
+    <p style="text-align: center; font-size: 1.05em; color: #666; margin-bottom: 30px;">
+        La guía completa de <strong>aromas + velas terapéuticas</strong> para que recuperes la calma, duermas sin miedo y vuelvas a respirar tranquilo. Cada aroma, cada vela, cada técnica está pensada para trabajar *con* tu sistema nervioso, no contra él.
+    </p>
+    
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">🧴</div>
+            <h4>Aromas específicos para cada emoción</h4>
+            <p>Sé exactamente qué esencia usar para ansiedad, cuál para el miedo nocturno y cuál para dormir profundo. Sin adivinar.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">🕯</div>
+            <h4>Técnicas de velas que funcionan</h4>
+            <p>Cómo usar una vela para que realmente calme. Tiempo, distancia, combinaciones — el método que la mayoría no conoce.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">🔬</div>
+            <h4>Basado en la ciencia, sin química pesada</h4>
+            <p>Cada aroma tiene un por qué. Cómo actúa en tu cerebro, por qué funciona, y cómo aprovecharlo al máximo.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">📋</div>
+            <h4>Protocolo diario paso a paso</h4>
+            <p>Mañana, tarde, noche — sé exactamente qué hacer en cada momento del día para mantener la calma.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">🎯</div>
+            <h4>Planes para cada diagnóstico</h4>
+            <p>Tienes ansiedad social, miedo nocturno, insomnio o todo junto. Cada plan es para vos, específico.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">💰</div>
+            <h4>Sin gastar fortunas</h4>
+            <p>Los mejores aromas no son los más caros. Te muestro qué comprar, dónde, y cuándo para que rinda.</p>
+        </div>
+    </div>
+</section>
 
-  <footer class="app-foot">
-    Naturalmente Vela
-    <div class="copyright">© 2026 Naturalmente Vela. Todos los derechos reservados.<br>Prohibida su reproducción, distribución, reventa o uso compartido total o parcial sin autorización expresa.</div>
-  </footer>
-</div>
+<!-- BENEFITS SECTION -->
+<section class="container">
+    <h2>Esto es lo que vas a recuperar</h2>
+    
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">😌</div>
+            <h4>Calma real en 10 minutos</h4>
+            <p>Ya no es "tratarás de tranquilizarte". Con la técnica correcta, la ansiedad baja en menos de lo que tarda un capítulo de Netflix.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">😴</div>
+            <h4>Dormir sin despertarte a las 3 am</h4>
+            <p>Nada de noches de mierda. Con el protocolo nocturno, dormís profundo y amanecés descansado.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">🧠</div>
+            <h4>Claridad mental otra vez</h4>
+            <p>Se va la niebla, vuelven tus ganas de vivir. El cerebro despejado, sin esa "rueda" de ansiedad 24/7.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">💪</div>
+            <h4>Bienestar sin depender de nada externo</h4>
+            <p>Aromas naturales, técnicas que tú controlas. No medicinas, no apps que requieren suscripción. Vos sos el que decide.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">👃</div>
+            <h4>Tomar control de tus emociones</h4>
+            <p>Ya no es "esperar a que se pase". Cuando sientas que la ansiedad viene, tenés el botiquín listo para responder al toque.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">🌙</div>
+            <h4>Noches tranquilas que recuerdes sin miedo</h4>
+            <p>Dormir profundo, despertar bien. Y lo mejor: sin culpa de "estoy usando medicinas para esto".</p>
+        </div>
+    </div>
+</section>
 
-<a class="wa-float" href="https://wa.me/50671526402?text=Hola%2C%20necesito%20soporte%20con%20la%20gu%C3%ADa%20interactiva%20de%20velas%20%F0%9F%95%AF%EF%B8%8F" target="_blank" rel="noopener">
-  <span class="wa-ic">💬</span><span>¿Necesitas soporte?</span>
-</a>
+<!-- WHAT'S INSIDE SECTION -->
+<section class="container" style="background: #f9f3ef;">
+    <h2>Dentro del Botiquín Emocional</h2>
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">
+        Qué encontrás en la guía completa.
+    </p>
+    
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #c17a5a;">
+            <div class="list-icon">📌</div>
+            <strong>Aromaterapia Emocional Completa</strong>
+            <p style="margin-top: 8px;">Guía de 15 aromas principales — cuál usar para ansiedad, miedo nocturno, insomnio, estrés y tristeza. Con propiedades, cómo aplicar y dosis correctas.</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #c17a5a;">
+            <div class="list-icon">🕯</div>
+            <strong>Protocolos de Velas por Emoción</strong>
+            <p style="margin-top: 8px;">Paso a paso: cómo armar tu botiquín de velas. Qué vela para qué momento. Dónde ponerla, por cuánto tiempo, y cómo potenciar el efecto.</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #c17a5a;">
+            <div class="list-icon">📅</div>
+            <strong>Rutina Diaria de Calma</strong>
+            <p style="margin-top: 8px;">Mañana (despertar bien), Tarde (mantener la calma laboral), Noche (dormir profundo). Exactamente qué aroma, qué vela, qué técnica en cada horario.</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #c17a5a;">
+            <div class="list-icon">🆘</div>
+            <strong>Protocolos de Emergencia</strong>
+            <p style="margin-top: 8px;">Ansiedad aguda. Ataque de pánico. Miedo intenso. Cuando necesitás calma YA, exactamente qué hacer en los primeros 2 minutos.</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #c17a5a;">
+            <div class="list-icon">🔬</div>
+            <strong>La Ciencia Detrás de Cada Aroma</strong>
+            <p style="margin-top: 8px;">Por qué funciona la lavanda. Cómo el cedro cambia tu sistema nervioso. La neurociencia explicada sin tecnicismos.</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #c17a5a;">
+            <div class="list-icon">🛒</div>
+            <strong>Lista de Compras Inteligente</strong>
+            <p style="margin-top: 8px;">Cuáles son los aromas imprescindibles. Qué marcas funcionan realmente (y no son las más caras). Dónde comprar sin gastar una fortuna.</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #c17a5a;">
+            <div class="list-icon">💡</div>
+            <strong>Hacks de Aplicación</strong>
+            <p style="margin-top: 8px;">Técnicas que potencian el efecto. Combinaciones de aromas. Cómo "cargar" una vela para que funcione mejor.</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #c17a5a;">
+            <div class="list-icon">🎯</div>
+            <strong>Planes Personalizados</strong>
+            <p style="margin-top: 8px;">Tienes ansiedad social, miedo a viajar, insomnio heredado — cada diagnóstico tiene su protocolo específico.</p>
+        </div>
+    </div>
+</section>
 
+<!-- PRICING SECTION -->
+<section class="pricing-section container">
+    <h2 id="oferta">Recupera la calma sin riesgo</h2>
+    
+    <p style="color: #666; margin-bottom: 30px;">
+        Una guía que te va a acompañar de por vida. Acceso inmediato, sin esperas.
+    </p>
+    
+    <div class="pricing-box">
+        <div class="price-label">
+            Precio regular: <span class="price-old">49 US$</span>
+        </div>
+        
+        <div class="discount-badge">🔥 68% OFF — SOLO HOY</div>
+        
+        <div>Pagás solo:</div>
+        <div class="price-current">
+            <span class="price-currency">US$</span>15.99
+        </div>
+        
+        <p style="color: #999; margin: 15px 0;">Acceso de por vida + actualizaciones futuras</p>
+        
+        <a href="#" class="cta-secondary">Quiero Mi Botiquín Ahora</a>
+        
+        <div class="urgency-notice">
+            🔴 Últimos 12 cupos con este precio. Solo abrimos 50 accesos mensuales para mantener soporte personalizado en WhatsApp. Reservá en los próximos 15 minutos.
+        </div>
+        
+        <div class="countdown">
+            ⏳ 00 Horas 47 Minutos 23 Segundos
+        </div>
+    </div>
+</section>
+
+<!-- GUARANTEE SECTION -->
+<section class="container">
+    <h2>Garantía de 60 Días — Riesgo Cero</h2>
+    
+    <div class="guarantee">
+        <div class="guarantee-icon">🛡</div>
+        <h3>La única forma de perder acá es no intentarlo</h3>
+        
+        <p style="margin-top: 15px; color: #666;">
+            Probá el Botiquín Emocional durante 60 días completos. Armá tu protocolo, usá los aromas, duerme con la rutina nocturna. Si en dos meses no sentís que la ansiedad bajó, que dormís mejor, que recuperaste la calma — pedís el reembolso y te devolvemos cada centavo.
+        </p>
+        
+        <p style="margin-top: 15px; font-weight: bold; color: #2d2d2d;">Sin preguntas, sin vueltas, sin trámites.</p>
+    </div>
+</section>
+
+<!-- TESTIMONIALS SECTION -->
+<section class="container" style="background: #f9f3ef;">
+    <h2>Lo que dicen quienes ya recuperaron la calma</h2>
+    
+    <div class="testimonials">
+        <div class="testimonial">
+            <p><em>"Dormía 4 horas interrumpidas. Con el protocolo nocturno, a la segunda semana estaba durmiendo 8 horas de corrido. No puedo creer lo que cambió."</em></p>
+            <div class="testimonial-name">Carolina M.</div>
+            <div class="testimonial-role">Mamá, Psicóloga — Costa Rica</div>
+        </div>
+        
+        <div class="testimonial">
+            <p><em>"La ansiedad social me mataba. Ahora llevo mi protocolo de emergencia y sé que tengo algo que funciona. La confianza volvió."</em></p>
+            <div class="testimonial-name">Alejandra T.</div>
+            <div class="testimonial-role">Vendedora — México</div>
+        </div>
+        
+        <div class="testimonial">
+            <p><em>"No sabía qué aromas eran reales y qué era un cuento. La guía me mostró exactamente la ciencia. Ahora uso todo con seguridad y resultados."</em></p>
+            <div class="testimonial-name">Sofia L.</div>
+            <div class="testimonial-role">Estudiante, Padre de dos — Argentina</div>
+        </div>
+    </div>
+</section>
+
+<!-- WHAT'S INCLUDED SECTION -->
+<section class="container">
+    <h2>Qué incluye tu acceso</h2>
+    
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">📱</div>
+            <h4>Acceso desde celular y computadora</h4>
+            <p>Llevá el Botiquín donde vayas — en la oficina, en casa, en la calle cuando la ansiedad te atrape.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">📧</div>
+            <h4>Entrega inmediata por email</h4>
+            <p>Sin esperas. Apenas confirmás la compra, ya tenés el enlace para acceder todo desde ya.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">♾</div>
+            <h4>Acceso de por vida + actualizaciones</h4>
+            <p>Es tuyo para siempre. Cada actualización, cada nuevo protocolo que agreguemos, lo tenés incluido sin costo extra.</p>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">💬</div>
+            <h4>Soporte WhatsApp personalizado</h4>
+            <p>Preguntas sobre tu protocolo, dudas con los aromas — contactá y te respondemos directamente.</p>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="#" class="cta-primary">Quiero Acceso Ahora →</a>
+    </div>
+</section>
+
+<!-- FAQ SECTION -->
+<section class="container" style="background: #f9f3ef;">
+    <h2>Preguntas frecuentes</h2>
+    
+    <div class="faq-item">
+        <div class="faq-question">
+            <span>¿En cuánto tiempo voy a sentir cambios?</span>
+            <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+            <p>Depende de la persona, pero muchos sienten cambios en ansiedad/calma dentro de los primeros 3-5 días. Dormir mejor suele tomar una o dos semanas. Por eso la garantía es de 60 días: tiempo real para que tu cuerpo responda.</p>
+        </div>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">
+            <span>¿Es reemplazo de terapia o medicinas?</span>
+            <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+            <p>No. El Botiquín Emocional es un complemento que funciona paralelamente. Si estás con medicinas psiquiátricas, seguís con tu médico. Esto potencia el bienestar, no reemplaza tratamiento profesional.</p>
+        </div>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">
+            <span>¿Necesito comprar aromas caros o raros?</span>
+            <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+            <p>No. Los mejores aromas para ansiedad e insomnio los conseguís en Amazon, Iherb o farmacias locales. La guía incluye la lista de compras exacta con precios accesibles.</p>
+        </div>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">
+            <span>¿Qué pasa si tengo alergias?</span>
+            <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+            <p>La guía incluye alternativas y "sustituciones seguras". Si eres alérgica a la manzanilla, tenés otras opciones. Si los aromas nebulizados no te van, hay métodos que no generan ese riesgo.</p>
+        </div>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">
+            <span>¿Cuánto tiempo debo dedicar diariamente?</span>
+            <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+            <p>Mínimo 5 minutos en la mañana, 5 minutos en la tarde si es necesario, 10 minutos antes de dormir. En total, 15-20 minutos diarios. La mayoría lo hace sin darse cuenta mientras hace otra cosa.</p>
+        </div>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">
+            <span>¿Por cuánto tiempo tengo acceso?</span>
+            <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+            <p>De por vida. Es una compra única. No hay suscripción mensual, no hay renovación. Comprás una vez y es tuyo para siempre.</p>
+        </div>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">
+            <span>¿Cómo accedo después de comprar?</span>
+            <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+            <p>Inmediato. Te llega un email con el enlace de acceso (dentro de 2 minutos de confirmada la compra). Podés empezar desde tu celular o computadora ya mismo.</p>
+        </div>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-question">
+            <span>¿Qué pasa si no me sirve o no me gusta?</span>
+            <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+            <p>Tenés 60 días de garantía total. Si después de dos meses de usar el Botiquín no ves ni sentís diferencia en tu ansiedad o sueño, pedís el reembolso completo. Sin preguntas, sin vueltas.</p>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="container">
+    <h2>Tu botiquín emocional te está esperando</h2>
+    
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">
+        60 días para recuperar la calma, dormir profundo y vivir sin ese peso de la ansiedad. Sin riesgo.
+    </p>
+    
+    <div style="text-align: center;">
+        <a href="#" class="cta-primary" style="font-size: 1.05em; padding: 18px 35px;">Quiero Mi Botiquín Emocional →</a>
+    </div>
+    
+    <div class="trust-badges" style="justify-content: center; margin-top: 25px;">
+        <span><span class="star-rating">★★★★★ 4.8/5</span> — avalado por terapeutas y usuarios</span>
+        <span>🛡 Garantía 60 Días</span>
+        <span>📱 Acceso inmediato</span>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <p style="margin-bottom: 20px;">
+            <strong>© 2026 Naturalmente Velas — Tu Botiquín Emocional</strong>
+        </p>
+        
+        <p style="font-size: 0.85em; color: #999; margin-bottom: 15px;">
+            El contenido de esta guía es informativo y educativo. No reemplaza la opinión de un profesional de salud mental o médico. Si tenés trastorno de ansiedad diagnosticado o depresión, consultá con tu terapeuta o psiquiatra antes de realizar cambios en tu tratamiento.
+        </p>
+        
+        <div class="footer-links">
+            <a href="#">Términos y Condiciones</a>
+            <a href="#">Política de Privacidad</a>
+            <a href="#">Contacto</a>
+        </div>
+    </div>
+</footer>
+
+<!-- FAQ FUNCTIONALITY -->
 <script>
-/* ============================================================
-   DATA
-============================================================ */
-const recipes = {
-  "parafina-molde": {
-    label:"Parafina · Molde", title:"Vela de Parafina en Molde",
-    meta:["Intermedio","~25 min activos","8–12 h enfriado"],
-    ingredients:[
-      "250 g de cera de parafina (o mezcla parafina/estearina 9:1)",
-      "1 pabilo grueso con base metálica",
-      "Molde de silicona o policarbonato",
-      "Vaselina o desmoldante",
-      "Fragancia 6–10% (opcional)",
-      "Colorante para cera (opcional)",
-    ],
-    steps:[
-      "Aplica una capa fina de vaselina en el molde si no es de silicona.",
-      "Derrite la cera a baño María hasta 85–90°C.",
-      "Introduce el pabilo por el orificio superior y fíjalo bien.",
-      "Deja enfriar a temperatura de mezcla y agrega fragancia y color.",
-      "Vierte lentamente, golpeando suave el molde para liberar burbujas.",
-      "Deja enfriar por completo, idealmente 8–12 horas.",
-      "Desmolda con cuidado, tirando en línea recta.",
-      "Nivela la base con un cuchillo caliente y recorta el pabilo.",
-    ],
-    tip:"Si se hunde al centro al enfriar, es normal en moldeado: rellena con una segunda colada de cera derretida."
-  },
-  "soya-molde": {
-    label:"Soya · Molde", title:"Vela de Soya en Molde",
-    meta:["Intermedio-alto","~25 min activos","10–14 h enfriado"],
-    ingredients:[
-      "250 g de cera de soya especial para molde (alto punto de fusión, ~54–60°C)",
-      "1 pabilo mediano-grueso con base metálica",
-      "Molde de silicona flexible (recomendado)",
-      "Spray desmoldante apto para silicona",
-      "Fragancia 6–8% (opcional)",
-      "Colorante para cera (opcional)",
-    ],
-    steps:[
-      "Derrite la cera a baño María hasta 75–80°C.",
-      "Aplica una capa fina de spray desmoldante en el molde.",
-      "Introduce y fija el pabilo en el centro.",
-      "Deja enfriar a temperatura de mezcla (~55–60°C) y agrega fragancia y color.",
-      "Vierte lentamente, golpeando suave el molde.",
-      "Deja enfriar sin corrientes de aire, 10 a 14 horas.",
-      "Refrigera el molde 15–20 min antes de desmoldar.",
-      "Desmolda con cuidado: la soya es más frágil que la parafina.",
-    ],
-    tip:"Usa siempre soya de alto punto de fusión (~54–60°C) para molde: es más firme, se contrae al enfriar y eso facilita el desmolde. La de bajo punto de fusión (la de vaso) es demasiado blanda y no sostiene su forma fuera del recipiente."
-  },
-  "soya-vaso": {
-    label:"Soya · Vaso", title:"Vela de Soya en Vaso",
-    meta:["Principiante","~15 min activos","3–7 días curado"],
-    ingredients:[
-      "200 g de cera de soya (bajo punto de fusión, ~46–52°C)",
-      "1 pabilo de algodón mediano con base metálica",
-      "14–20 g de fragancia (7–10% del peso de la cera)",
-      "1 recipiente de vidrio resistente al calor",
-      "Colorante para cera (opcional)",
-    ],
-    steps:[
-      "Pesa la cera y derrítela a baño María hasta 75–80°C.",
-      "Mientras se derrite, fija el pabilo en el centro del vaso.",
-      "Deja enfriar hasta la temperatura de mezcla (~55–60°C).",
-      "Agrega la fragancia y remueve suavemente por 1 minuto.",
-      "Si usas colorante, incorpóralo en este punto.",
-      "Vierte dejando 1 cm libre en el borde superior.",
-      "Deja reposar sin mover al menos 4 horas.",
-      "Recorta el pabilo a 6 mm y deja curar de 3 a 7 días.",
-    ],
-    tip:"Tu primera vela no tiene que ser perfecta: tiene que enseñarte algo. Anota cada variable que uses."
-  },
-  "capas-color": {
-    label:"Capas de color", title:"Vela de Soya en Capas de Color",
-    meta:["Intermedio","~40 min activos","3–7 días curado"],
-    ingredients:[
-      "200 g de cera de soya, divididos en 3 partes de ~65 g",
-      "1 pabilo de algodón mediano con base metálica",
-      "3 colorantes distintos para cera",
-      "14–20 g de fragancia total (7–10% del peso de la cera)",
-      "1 recipiente de vidrio recto (mejor sin curvas) resistente al calor",
-    ],
-    steps:[
-      "Divide la cera en 3 partes iguales y derrite solo la primera a 75–80°C.",
-      "Fija el pabilo centrado en el recipiente antes de verter la primera capa.",
-      "Agrega color y fragancia a la primera parte, deja enfriar a temperatura de mezcla y vierte una capa fina.",
-      "Espera hasta que esta capa forme una película firme al tacto (20–30 min) antes de continuar.",
-      "Derrite la segunda parte, colorea con un tono distinto y vierte un poco más fría que la capa anterior.",
-      "Repite el mismo proceso de espera y vertido con la tercera capa y color.",
-      "Deja enfriar el conjunto por completo, sin mover, durante al menos 4 horas.",
-      "Recorta el pabilo a 6 mm y deja curar de 3 a 7 días antes de vender o regalar.",
-    ],
-    tip:"La paciencia es la técnica: si viertes la siguiente capa demasiado pronto o demasiado caliente, los colores se mezclan entre sí y pierdes la definición de las líneas."
-  },
-};
-
-const waxDensity = [
-  {name:"Soya", factor:0.85},
-  {name:"Parafina", factor:0.90},
-  {name:"Cera de coco", factor:0.88},
-  {name:"Abejas", factor:0.96},
-  {name:"Gel", factor:0.88},
-];
-
-const waxTypes = [
-  {ic:"🫘", name:"Soya", best:"Velas en vaso, principiantes", tags:["Vegetal","Quemado limpio"], notes:["Fácil de trabajar y predecible","Buena retención de aroma","Perdona pequeños errores de temperatura","Bajo punto de fusión (~46–52°C): suave, ideal para vaso","Alto punto de fusión (~54–60°C): firme, ideal para molde"]},
-  {ic:"🪨", name:"Parafina", best:"Velas en molde, figuras", tags:["Mineral","Económica"], notes:["Excelente moldeado y desmolde","Colores muy vibrantes","Ideal para piezas decorativas"]},
-  {ic:"🥥", name:"Cera de coco", best:"Velas premium en vaso", tags:["Vegetal","Cremosa"], notes:["Muy buena adherencia al vidrio","Textura suave y pareja","Suele mezclarse con soya"]},
-  {ic:"🐝", name:"Abejas", best:"Velas rústicas", tags:["Animal","Aroma natural"], notes:["Quemado muy limpio","Punto de fusión alto","Aroma propio suave a miel"]},
-  {ic:"💎", name:"Gel", best:"Velas decorativas transparentes", tags:["Mineral","Transparente"], notes:["Permite incrustar objetos","Efecto vidrio líquido","Requiere pabilo especial"]},
-];
-
-const scentFamilies = [
-  {ic:"🌸", name:"Florales", ex:"Rosa, jazmín, azahar", use:"Delicadeza y romanticismo"},
-  {ic:"🪵", name:"Amaderadas", ex:"Sándalo, cedro, vainilla", use:"Calidez y sensación de hogar"},
-  {ic:"🍋", name:"Cítricas", ex:"Limón, naranja, bergamota", use:"Energía y frescura"},
-  {ic:"🍮", name:"Gourmand", ex:"Vainilla, caramelo, café", use:"Confort, ideal en temporada fría"},
-  {ic:"🌊", name:"Frescas/acuáticas", ex:"Algodón limpio, brisa marina", use:"Espacios como baños o lavanderías"},
-];
-
-const colorGuide = [
-  {ic:"🟡", name:"Amarillo / Naranja", pair:"Cítricas", note:"Refuerza la sensación de frescura y energía."},
-  {ic:"🟣", name:"Morado / Azul", pair:"Florales relajantes", note:"Asociado a lavanda y notas calmantes."},
-  {ic:"🟤", name:"Marrón / Tierra", pair:"Amaderadas / Gourmand", note:"Comunica calidez, vainilla o café."},
-  {ic:"🌹", name:"Rosa / Rojo", pair:"Florales dulces", note:"Romántico, ideal para regalos y eventos."},
-  {ic:"🟢", name:"Verde", pair:"Frescas/acuáticas", note:"Natural, asociado a hierbas o brisa marina."},
-];
-
-const faults = [
-  {p:"Hundimiento en el centro (sinkhole)", c:"Enfriamiento demasiado rápido o cera vertida a temperatura incorrecta.", s:"Vierte a la temperatura recomendada y deja enfriar a temperatura ambiente, lejos de corrientes de aire."},
-  {p:"Túnel: no se derrite pareja", c:"Pabilo muy delgado o primera quemada demasiado corta.", s:"Elige el grosor correcto (usa la calculadora de pabilo) y deja quemar hasta el borde la primera vez."},
-  {p:"Grietas blancas en la superficie", c:"Natural en ceras vegetales por cambios de temperatura.", s:"Vierte un poco más caliente y evita cambios bruscos de temperatura al enfriar."},
-  {p:"Aroma débil al encender", c:"Porcentaje de fragancia bajo o temperatura de mezcla incorrecta.", s:"Respeta el 6–10% recomendado y mezcla a la temperatura indicada por tu proveedor."},
-  {p:"Burbujas de aire en la vela", c:"Mezcla batida con demasiada fuerza o molde/vaso frío.", s:"Remueve con movimientos suaves y precalienta el recipiente antes de verter."},
-  {p:"Llama muy alta o humo excesivo", c:"Pabilo demasiado grueso para el diámetro del recipiente.", s:"Recorta a 6 mm antes de cada uso y verifica el grosor con la calculadora de pabilo."},
-];
-
-const faqs = [
-  {q:"¿Puedo reutilizar recipientes de velas ya usadas?", a:"Sí. Calienta ligeramente para retirar los restos, limpia con papel absorbente y lava con agua caliente y jabón. Seca por completo antes de verter una nueva mezcla."},
-  {q:"¿Por qué mi vela cambia de color al enfriar?", a:"Es normal que el color se aclare uno o dos tonos respecto al líquido caliente. Si el cambio es muy drástico, revisa la cantidad de colorante usada."},
-  {q:"¿Cuánto dura una vela artesanal en buen estado?", a:"Bien almacenada, conserva aroma y color por 12 a 18 meses aproximadamente."},
-  {q:"¿Necesito un espacio grande para empezar?", a:"No. Muchas personas inician en una esquina de la cocina con lo esencial: hornilla, olla de fusión y una mesa protegida."},
-];
-
-const glossary = [
-  {t:"Punto de fusión", d:"Temperatura a la que la cera pasa de sólido a líquido."},
-  {t:"Temperatura de mezcla", d:"Temperatura ideal para incorporar fragancia y colorante antes de verter."},
-  {t:"Curado", d:"Periodo de reposo tras la elaboración durante el cual el aroma se asienta."},
-  {t:"Frosting", d:"Cristalización blanquecina natural en la superficie de ceras vegetales."},
-  {t:"Sinkhole", d:"Hundimiento en el centro de la vela por enfriamiento desigual."},
-  {t:"Piscina de cera", d:"Capa de cera derretida en la superficie mientras la vela está encendida."},
-  {t:"Carga de fragancia", d:"Porcentaje de aceite aromático respecto al peso total de la cera."},
-  {t:"Pabilo", d:"Mecha que sostiene la llama y permite la combustión controlada."},
-];
-
-const waxCompare = [
-  {ic:"🌱", name:"Vegetal (soya, coco)", best:"Vaso, uso diario, principiantes", notes:["Quemado limpio, poco hollín","Buena retención de aroma","Biodegradable y renovable","Más sensible a cambios de temperatura (frosting)"]},
-  {ic:"🪨", name:"Mineral (parafina)", best:"Moldes, figuras, colores vibrantes", notes:["Excelente moldeado y desmolde","Colores más intensos y definidos","Económica y fácil de conseguir","Deriva del petróleo, menos 'natural' para el cliente"]},
-  {ic:"💎", name:"Gel", best:"Piezas decorativas transparentes", notes:["Efecto vidrio líquido, muy vistoso","Permite incrustar objetos decorativos","Requiere pabilo y contenedor especial","Nicho decorativo, no para uso diario intensivo"]},
-];
-
-const unitConversions = [
-  {from:"Gramos → Onzas", calc:(v)=> (v/28.3495).toFixed(2)+" oz", unit:"g"},
-  {from:"Onzas → Gramos", calc:(v)=> (v*28.3495).toFixed(1)+" g", unit:"oz"},
-  {from:"Centímetros → Pulgadas", calc:(v)=> (v/2.54).toFixed(2)+" in", unit:"cm"},
-  {from:"Pulgadas → Centímetros", calc:(v)=> (v*2.54).toFixed(1)+" cm", unit:"in"},
-  {from:"Mililitros → Onzas fluidas", calc:(v)=> (v/29.5735).toFixed(2)+" fl oz", unit:"ml"},
-];
-
-const quizQuestions = [
-  {q:"¿Cuál es tu experiencia con velas?", options:[
-    {t:"Nunca he hecho una", score:{"soya-vaso":2,"parafina-molde":0,"soya-molde":0}},
-    {t:"Ya hice una o dos", score:{"soya-vaso":1,"parafina-molde":1,"soya-molde":1}},
-    {t:"Tengo práctica", score:{"soya-vaso":0,"parafina-molde":2,"soya-molde":1}},
-  ]},
-  {q:"¿Qué buscas lograr?", options:[
-    {t:"Algo simple para regalar", score:{"soya-vaso":2,"parafina-molde":0,"soya-molde":0}},
-    {t:"Una forma o figura definida", score:{"soya-vaso":0,"parafina-molde":2,"soya-molde":1}},
-    {t:"Un producto 100% vegetal con forma", score:{"soya-vaso":0,"parafina-molde":0,"soya-molde":2}},
-  ]},
-  {q:"¿Cuánto tiempo tienes disponible hoy?", options:[
-    {t:"Menos de 30 minutos activos", score:{"soya-vaso":2,"parafina-molde":1,"soya-molde":1}},
-    {t:"Puedo dedicarle toda la tarde", score:{"soya-vaso":1,"parafina-molde":2,"soya-molde":2}},
-  ]},
-  {q:"¿Qué materiales tienes a mano?", options:[
-    {t:"Solo un vaso o recipiente de vidrio", score:{"soya-vaso":2,"parafina-molde":0,"soya-molde":0}},
-    {t:"Tengo un molde de silicona", score:{"soya-vaso":0,"parafina-molde":1,"soya-molde":2}},
-    {t:"Tengo molde rígido de policarbonato", score:{"soya-vaso":0,"parafina-molde":2,"soya-molde":0}},
-  ]},
-];
-
-const storageTips = [
-  {ic:"🌡️", name:"Temperatura", tip:"Guarda tus velas en un lugar fresco, entre 15–25°C. El calor extremo las deforma y el frío intenso puede generar grietas."},
-  {ic:"☀️", name:"Luz solar", tip:"La luz directa decolora la cera y degrada la fragancia con el tiempo. Guarda en un lugar oscuro o con luz indirecta."},
-  {ic:"📦", name:"Empaque cerrado", tip:"Mantén la tapa o el sello puesto cuando no estén en uso: evita que el polvo y el aire oxiden el aroma."},
-  {ic:"📅", name:"Vida útil", tip:"Bien almacenada, una vela artesanal conserva su aroma y color por 12 a 18 meses aproximadamente."},
-  {ic:"🧴", name:"Fragancias sin usar", tip:"Guarda tus aceites de fragancia en frascos oscuros y bien cerrados: se degradan más rápido que la cera."},
-  {ic:"🚚", name:"Transporte", tip:"Si envías por paquetería, usa relleno protector: los cambios bruscos de temperatura en tránsito pueden causar frosting."},
-];
-
-const curadoTimes = [
-  {ic:"🫘", name:"Soya", dias:"3–7 días"},
-  {ic:"🪨", name:"Parafina", dias:"1–3 días"},
-  {ic:"🥥", name:"Cera de coco", dias:"5–10 días"},
-  {ic:"🐝", name:"Abejas", dias:"7–14 días"},
-];
-
-const burnTestSteps = [
-  "Enciende la vela y déjala arder hasta que la cera se derrita de borde a borde (usualmente entre 1 y 4 horas, según el diámetro).",
-  "Observa el tamaño y color de la llama: debe ser estable, sin humo excesivo ni chisporroteo.",
-  "Apaga la vela y observa el patrón de derretimiento al enfriarse.",
-  "Repite el encendido 3 a 4 veces para confirmar consistencia antes de producir en volumen.",
-];
-
-const burnSigns = {
-  good:["Llama de altura constante, entre 2 y 4 cm","Piscina de cera derretida uniforme, de borde a borde","Ausencia de humo negro u hollín en el recipiente"],
-  bad:["Llama muy alta y con parpadeo constante → pabilo demasiado grueso","Llama pequeña que no derrite toda la superficie → pabilo demasiado delgado"]
-};
-
-const temario = [
-  {m:"Módulo 1: Bienvenida", items:["Bienvenidos a Diseña y Crea Velas Artesanales","Recomendaciones antes de iniciar a ver tus clases","Cómo ingresar al grupo de alumnos"]},
-  {m:"Módulo 2: Herramientas, materiales y medidas de seguridad", items:["Medidas de bioseguridad","Herramientas que usaremos","Materiales e insumos que usaremos","Proveedores"]},
-  {m:"Módulo 3: Conociendo las ceras", items:["Tipos de ceras","Diferencias entre la parafina y la cera natural","Cómo identificar los puntos de fusión de las ceras","Conoce qué tipo de cera puedes usar según la vela que vayas a hacer","Cómo calcular la cantidad de cera según el envase o molde que vayas a usar","Cómo calcular el porcentaje de fragancia","Combinación de la cera y parafina"]},
-  {m:"Módulo 4: Cómo darle color y aroma a tus velas", items:["Con qué puedo darle color a mis velas","Con qué puedo darle aroma a mis velas","Recomendaciones para un aroma duradero en tus velas"]},
-  {m:"Módulo 5: Pabilos y aditivos", items:["Conoce todo sobre los pabilos","Qué aditivos puedes usar para tus velas"]},
-  {m:"Módulo 6: Curación y quemado", items:["Importancia del curado y pruebas de quemado","Curado: primera clave para velas funcionales y profesionales","Pruebas de quemado: cómo hacerlo de la manera correcta"]},
-  {m:"Módulo 7: Lo que necesitas saber sobre los moldes", items:["Tipos de moldes","Mantenimiento de tus moldes"]},
-  {m:"Módulo 8: Preguntas frecuentes", items:["Introducción a este módulo","¿Por qué le salen manchas a mis velas de molde y cómo lo evito?","¿Por qué le salen manchas a mis velas de vaso y cómo lo evito?","¿Por qué sudan mis velas?","¿Por qué se agrietan mis velas?","¿Por qué se rompen las velas de molde?","¿Por qué mis velas en molde se derriten tan rápido o quedan grasosas?","¿Por qué se hunden (rechupe) o se les hace un hueco y cómo lo soluciono?","¿Por qué mis velas se arrugan en la superficie?","¿Qué es el frosting en las velas y por qué pasa?","¿Por qué se hace un túnel en la vela y cómo lo arreglo?","¿Por qué mis velas no huelen?","Otras respuestas a preguntas básicas"]},
-  {m:"Módulo 9: Comenzamos con la práctica", items:["Mi primera vela en vaso","Cómo elaborar crema chantilly o crema batida","Mi primera vela en molde","Vela en envase con decoración y frase","Vela marmoleada","Vela en vaso con flores secas","Vela en vaso con flores secas técnica #2","Vela en capas inclinadas","Velita tipo souvenir","Vela en envase con decoración de vela de molde matizada"]},
-  {m:"Módulo 10: Velas tipo postre o reposteras", items:["Vela tartaleta con fresas y almíbar","Vela tipo cupcake","Vela tipo pastel, torta o ponqué","Vela tipo pastel de 3 pisos","Vela malteada de chocolate","Vela café helado con efecto hielo","Vela copa de helado con frutas","Vela tipo cerveza","Vela copa de vino","Vela con efecto galleta triturada"]},
-  {m:"Módulo 11: Velas con cera de arena", items:["Introducción: qué es y cómo usar la cera de arena","Tu primera vela con esta cera","Vela en capas de colores"]},
-  {m:"Módulo 12: Aprende a elaborar otros tipos de velas", items:["Velas para masajes","Wax melts","Tablet wax"]},
-  {m:"Módulo 13: Costos, precios y tu marca", items:["Cómo sacar tus costos y cuánto cobrar por tus velas (plantilla de Excel)","Bono: calculadora digital","Aprende a crear tu logo","Aprende a elaborar tus tarjetas de agradecimiento"]},
-  {m:"Módulo 14: Clases especiales", items:["Velas con efecto horneado","Fanal vitral","Vela de agua o técnica coral","Velas geoda","Técnica porcelana 1","Técnica porcelana 2"]},
-  {m:"Módulo 15: Bonos", items:["Vela tipo acuario","Vela con yeso y piedras decorativas","Bouquet de velas","Velón con encapsulado floral","Ambientadores","Porta velas y envases de yeso","Guía digital: velas comestibles"]},
-  {m:"Módulo 16: Flores pétalo a pétalo", items:["Materiales e insumos","Elaboración de la primera flor, fórmula 1","Elaboración de segunda flor, fórmula 2","Elaboración de tercera flor, fórmula 3"]},
-  {m:"Módulo 17: Velas navideñas", items:["Pino navideño","Papá Noel, técnica de pintura en velas","Casita navideña efecto nieve","Villa navideña","Velita de reno","Vela marmoleada para navidad","Velón decorado con decoupage","Wax melts navideños"]},
-  {m:"Módulo 18: Velas premium", items:["Bouquet en cuadro","Velón técnica Almazara","Velón decoupage 1","Velón decoupage 2","Vela mágica en agua"]},
-  {m:"Módulo 19: Aprende a elaborar jabones de glicerina", items:["Qué es la glicerina, tipos y usos","Materiales y herramientas a usar","Cómo calcular la glicerina para cada molde","Cómo derretir la glicerina","Mi primer jabón con base blanca","Mi primer jabón con base transparente","Aditivos para los jabones","Jabón exfoliante de avena","Jabón de miel y coco","Jabón de cúrcuma","Empaquetado y almacenamiento de nuestros jabones","Recetario"]},
-  {m:"Módulo 20: Despedida", items:["Cierre del curso"]},
-];
-
-const safetyTips = [
-  {ic:"🌬️", name:"Ventilación", tip:"Trabaja en un espacio ventilado, libre de corrientes de aire fuertes."},
-  {ic:"🧯", name:"Sin agua", tip:"Nunca apagues un principio de incendio de cera con agua: usa bicarbonato de sodio."},
-  {ic:"👕", name:"Ropa segura", tip:"Manga larga, sin telas sintéticas, cabello recogido y sin accesorios colgantes."},
-  {ic:"🍲", name:"Baño María", tip:"Calienta siempre a baño María o con derretidor controlado, nunca a fuego directo."},
-  {ic:"👀", name:"Supervisión", tip:"Nunca dejes la cera caliente sin supervisión, ni un momento."},
-  {ic:"🌡️", name:"Punto de inflamación", tip:"Conoce el punto de inflamación de tu cera y no lo superes nunca."},
-];
-
-const startKit = [
-  "Olla o jarra de fusión (con pico vertedor)",
-  "Termómetro de cocina o repostería",
-  "Báscula digital (precisión de 1 g)",
-  "Pinzas para centrar el pabilo",
-  "Palito o espátula para remover",
-  "Recipientes o moldes",
-  "Guantes y superficie protegida",
-  "Cera según el proyecto",
-  "Pabilo adecuado al diámetro",
-  "Fragancia o esencia para velas",
-  "Colorante específico para cera",
-  "Etiquetas con soporte para pabilo",
-];
-
-const plan30 = [
-  "Semana 1 — Practica la técnica base con 3 lotes de prueba",
-  "Semana 1 — Define 2–3 aromas y 1–2 formatos para tu catálogo",
-  "Semana 2 — Define nombre, colores y estilo de etiqueta",
-  "Semana 2 — Toma fotografías con luz natural",
-  "Semana 3 — Calcula tus costos reales y define precios",
-  "Semana 3 — Prepara tu empaque final y ficha de cuidados",
-  "Semana 4 — Publica tu catálogo y ofrece un incentivo de lanzamiento",
-  "Semana 4 — Pide a tus primeros clientes una foto o testimonio",
-];
-
-const palette = {
-  berry: {bg:"#F0DEDD", accent:"#8C3B4A", deep:"#5E2530"},
-  honey: {bg:"#F1DFB8", accent:"#B9812E", deep:"#7A5620"},
-  sage:  {bg:"#E1E8DC", accent:"#5F7A5E", deep:"#3C4F3B"},
-  clay:  {bg:"#EDD9C4", accent:"#A65A34", deep:"#6E3A20"},
-  plum:  {bg:"#E5DAE6", accent:"#6B4E71", deep:"#463349"},
-  teal:  {bg:"#D9E5E2", accent:"#3F6E68", deep:"#294945"},
-};
-const HOME_BG = "#F1EBDD";
-
-const tiles = [
-  // 1. Orientación
-  {id:"empieza", ic:"👋", title:"Empieza aquí", sub:"Cómo usar esta app", color:"sage"},
-  {id:"quiz", ic:"🧭", title:"¿Qué vela deberías hacer?", sub:"Quiz de 4 preguntas", color:"clay"},
-
-  // 2. Antes de tocar cera
-  {id:"seguridad", ic:"🔥", title:"Seguridad esencial", sub:"6 reglas clave", color:"berry"},
-  {id:"kit", ic:"✅", title:"Kit de inicio", sub:"Checklist de materiales", color:"plum"},
-
-  // 3. Materiales y cálculos base
-  {id:"cera", ic:"🧪", title:"Elige tu cera", sub:"Compara 5 tipos", color:"honey"},
-  {id:"comparativa", ic:"⚖️", title:"Cera vegetal vs. mineral vs. gel", sub:"Comparativa rápida", color:"clay"},
-  {id:"cantidad", ic:"⚖️", title:"Cantidad de cera", sub:"Calcula cuánto necesitas", color:"plum"},
-  {id:"pabilo", ic:"🧵", title:"Calculadora de pabilo", sub:"Según el diámetro", color:"teal"},
-  {id:"aromas", ic:"🌸", title:"Familias de aroma", sub:"Encuentra tu estilo", color:"berry"},
-  {id:"color", ic:"🎨", title:"Guía de color", sub:"Combina color y aroma", color:"plum"},
-
-  // 4. Manos a la obra
-  {id:"recetas", ic:"🍯", title:"Recetas guiadas", sub:"Parafina y soya, molde y vaso", color:"honey"},
-
-  // 5. Después de hacer la vela
-  {id:"curado", ic:"🔥", title:"Curado y prueba de quemado", sub:"Cómo hacerlo correctamente", color:"teal"},
-  {id:"quemado", ic:"⏱️", title:"Tiempo de quemado", sub:"Estima cuántas horas dura", color:"plum"},
-  {id:"diagnostico", ic:"🛠️", title:"Diagnóstico de fallas", sub:"Soluciona un problema", color:"teal"},
-  {id:"vidautil", ic:"🗄️", title:"Vida útil y almacenamiento", sub:"Cuánto dura y cómo guardarla", color:"sage"},
-
-  // 6. De hobby a negocio
-  {id:"precio", ic:"💰", title:"Calculadora de precio", sub:"Costo + margen", color:"clay"},
-  {id:"plan", ic:"📅", title:"Plan de 30 días", sub:"Tu primer mes", color:"berry"},
-  {id:"diario", ic:"📓", title:"Diario de lotes", sub:"Registra tus pruebas", color:"berry"},
-
-  // 7. Referencia rápida
-  {id:"conversion", ic:"🔄", title:"Conversión de unidades", sub:"Gramos, onzas, cm, pulgadas", color:"teal"},
-  {id:"faq", ic:"❓", title:"Preguntas frecuentes", sub:"Dudas comunes", color:"berry"},
-  {id:"glosario", ic:"📖", title:"Glosario", sub:"Busca un término", color:"sage"},
-
-  // 8. Siguiente paso
-  {id:"curso", ic:"🎓", title:"Curso completo", sub:"El siguiente paso", color:"honey"},
-];
-
-/* ============================================================
-   APP SHELL / ROUTING
-============================================================ */
-const homeEl = document.getElementById('home');
-const panelEl = document.getElementById('panel');
-const homeBtn = document.getElementById('homeBtn');
-
-function renderTiles(){
-  document.getElementById('tileGrid').innerHTML = tiles.map(t=>{
-    const p = palette[t.color];
-    return `
-    <button class="tile" onclick="openPanel('${t.id}')">
-      <div class="ic" style="background:${p.bg}; color:${p.deep};">${t.ic}</div>
-      <b>${t.title}</b>
-      <small>${t.sub}</small>
-    </button>`;
-  }).join('');
-}
-renderTiles();
-
-function setTheme(colorKey){
-  const p = palette[colorKey] || palette.berry;
-  const root = document.documentElement.style;
-  root.setProperty('--accent', p.accent);
-  root.setProperty('--accent-deep', p.deep);
-  root.setProperty('--accent-bg', p.bg);
-  root.setProperty('--bg', p.bg);
-}
-
-function goHome(){
-  homeEl.classList.remove('hide');
-  panelEl.classList.remove('show');
-  panelEl.innerHTML = '';
-  homeBtn.classList.remove('show');
-  document.documentElement.style.setProperty('--bg', HOME_BG);
-  document.documentElement.style.setProperty('--accent', palette.berry.accent);
-  document.documentElement.style.setProperty('--accent-deep', palette.berry.deep);
-  document.documentElement.style.setProperty('--accent-bg', palette.berry.bg);
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-function openPanel(id){
-  const tile = tiles.find(t=>t.id===id);
-  setTheme(tile ? tile.color : 'berry');
-  homeEl.classList.add('hide');
-  panelEl.classList.add('show');
-  homeBtn.classList.add('show');
-  panelEl.innerHTML = panelBuilders[id]();
-  wireAfterRender(id);
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-function panelHeader(eyebrow, title, sub){
-  return `<div class="panel-head"><div class="eyebrow">${eyebrow}</div><h2>${title}</h2><p>${sub}</p></div>`;
-}
-
-/* ============================================================
-   PANEL BUILDERS
-============================================================ */
-const panelBuilders = {
-
-  empieza(){
-    return panelHeader('Bienvenida','¡Hola! Empecemos por aquí', 'Esta app no se lee de corrido como un libro: es una caja de herramientas. Toca lo que necesites, cuando lo necesites.') + `
-      <div class="card">
-        <h3 style="font-size:1.05rem;">¿Cómo funciona esta app?</h3>
-        <p style="margin-top:.5rem; font-size:.87rem;">Desde el inicio ves módulos como tarjetas. Tocas una, se abre esa herramienta sola, y con "← Inicio" (arriba) vuelves a ver todas. No hay que leer todo en orden ni de una sola vez.</p>
-      </div>
-
-      <div class="card" style="margin-top:.9rem;">
-        <h3 style="font-size:1.05rem;">Lo básico que debes saber antes de empezar</h3>
-        <ul style="margin-top:.6rem; padding-left:1.1rem;">
-          <li style="font-size:.85rem; color:var(--ink-soft); margin-bottom:.4rem;">Trabajarás con cera derretida caliente: la seguridad no es opcional, revísala primero.</li>
-          <li style="font-size:.85rem; color:var(--ink-soft); margin-bottom:.4rem;">Tu primera vela no tiene que salir perfecta — la cera es un material vivo, cada intento te enseña algo.</li>
-          <li style="font-size:.85rem; color:var(--ink-soft); margin-bottom:.4rem;">No necesitas comprar todo de una vez: con un kit básico ya puedes hacer tu primera vela.</li>
-        </ul>
-      </div>
-
-      <div class="card" style="margin-top:.9rem;">
-        <h3 style="font-size:1.05rem; margin-bottom:.7rem;">Tu ruta sugerida como principiante</h3>
-        <div class="route-list" id="routeList"></div>
-      </div>`;
-  },
-
-  recetas(){
-    return panelHeader('Módulo','Recetas guiadas','Elige una combinación de cera y formato.') + `
-      <div class="chips" id="recipeChips"></div>
-      <div id="recipeCard"></div>`;
-  },
-
-  cantidad(){
-    return panelHeader('Módulo','Cantidad de cera','Calcula cuánta cera necesitas para tu vaso o molde, con dos métodos.') + `
-      <div class="chips" id="methodChips">
-        <div class="chip active" data-m="agua">💧 Método del agua</div>
-        <div class="chip" data-m="geo">📐 Método geométrico</div>
-      </div>
-
-      <div class="card">
-        <h4 style="font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); margin-bottom:.5rem;">Tipo de cera</h4>
-        <div class="chips" id="waxFactorChips" style="margin-bottom:0;"></div>
-      </div>
-
-      <div class="card" id="methodAgua" style="margin-top:.9rem;">
-        <p style="font-size:.85rem; margin-bottom:.7rem;">Llena tu recipiente o molde con agua hasta la altura que planeas verter la cera, y pésala en tu báscula (1 mL de agua = 1 g). Ese peso es tu punto de partida.</p>
-        <div class="field"><label>Peso del agua (g)</label><input type="number" id="inWater" value="180" step="1" min="0"></div>
-        <div id="aguaResult"></div>
-      </div>
-
-      <div class="card" id="methodGeo" style="margin-top:.9rem; display:none;">
-        <p style="font-size:.85rem; margin-bottom:.7rem;">Para recipientes o moldes cilíndricos: mide el diámetro interno y la altura hasta donde quieres llenar de cera.</p>
-        <div class="calc-grid">
-          <div class="field"><label>Diámetro interno (cm)</label><input type="number" id="inDiam" value="7" step="0.1" min="0"></div>
-          <div class="field"><label>Altura de llenado (cm)</label><input type="number" id="inHeight" value="6" step="0.1" min="0"></div>
-        </div>
-        <div id="geoResult" style="margin-top:1rem;"></div>
-      </div>
-
-      <div class="tip-box" style="margin-top:.9rem;">💡 Para moldes con formas irregulares (no cilíndricas), el método del agua es mucho más preciso que el geométrico — úsalo siempre que puedas.</div>`;
-  },
-
-  cera(){
-    return panelHeader('Módulo','Elige tu cera','Toca un tipo de cera para ver sus fortalezas.') + `
-      <div class="chips" id="waxChips"></div>
-      <div id="waxResult"></div>`;
-  },
-
-  pabilo(){
-    return panelHeader('Módulo','Calculadora de pabilo','Ingresa el diámetro de tu recipiente en centímetros.') + `
-      <div class="card">
-        <div class="field"><label>Diámetro del recipiente (cm)</label><input type="number" id="wickDiam" value="8" min="1" step="0.5"></div>
-        <div id="wickResult" style="margin-top:1rem;"></div>
-      </div>`;
-  },
-
-  aromas(){
-    return panelHeader('Módulo','Familias de aroma','Toca una familia para ver ejemplos y su sensación.') + `
-      <div class="chips" id="scentChips"></div>
-      <div id="scentResult"></div>`;
-  },
-
-  color(){
-    return panelHeader('Módulo','Guía de color','Toca un color para ver con qué aroma combina mejor.') + `
-      <div class="chips" id="colorChips"></div>
-      <div id="colorResult"></div>`;
-  },
-
-  diagnostico(){
-    return panelHeader('Módulo','Diagnóstico de fallas','Selecciona el problema que estás viendo en tu vela.') + `
-      <div class="symptom-list" id="symptomList"></div>
-      <div id="diagResult"></div>`;
-  },
-
-  precio(){
-    return panelHeader('Módulo','Calculadora de precio','Precio = (costo + tiempo) ÷ (1 − margen deseado).') + `
-      <div class="card">
-        <div class="calc-grid">
-          <div class="field"><label>Costo de materiales ($)</label><input type="number" id="inCost" value="4.50" step="0.10"></div>
-          <div class="field"><label>Valor de tu tiempo ($)</label><input type="number" id="inTime" value="1.50" step="0.10"></div>
-          <div class="field"><label>Margen deseado (%)</label><input type="number" id="inMargin" value="40" step="5"></div>
-          <div class="field"><label>Unidades por lote</label><input type="number" id="inUnits" value="1" min="1" step="1"></div>
-        </div>
-        <div class="calc-out">
-          <div class="box"><span>Precio sugerido</span><b id="outPrice">$10.00</b></div>
-          <div class="box"><span>Ganancia / unidad</span><b id="outProfit">$4.00</b></div>
-        </div>
-      </div>`;
-  },
-
-  kit(){
-    return panelHeader('Módulo','Kit de inicio','Marca lo que ya tienes en tu espacio de trabajo.') + `
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; margin-bottom:.5rem;">
-          <b style="font-size:.85rem; color:var(--accent-deep);">Materiales esenciales</b>
-          <span class="count-pill" id="kitCount">0/${startKit.length}</span>
-        </div>
-        <div id="kitList"></div>
-        <div class="bar-track"><div class="bar-fill" id="kitBar"></div></div>
-      </div>`;
-  },
-
-  plan(){
-    return panelHeader('Módulo','Plan de 30 días','Tu ruta simple para el primer mes.') + `
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; margin-bottom:.5rem;">
-          <b style="font-size:.85rem; color:var(--accent-deep);">Checklist de lanzamiento</b>
-          <span class="count-pill" id="planCount">0/${plan30.length}</span>
-        </div>
-        <div id="planList"></div>
-        <div class="bar-track"><div class="bar-fill" id="planBar"></div></div>
-      </div>`;
-  },
-
-  seguridad(){
-    return panelHeader('Módulo','Seguridad esencial','Toca cada regla para ver el porqué.') + `
-      <div class="chips" id="safetyChips"></div>
-      <div id="safetyResult"></div>`;
-  },
-
-  faq(){
-    return panelHeader('Módulo','Preguntas frecuentes','Selecciona una pregunta para ver la respuesta.') + `
-      <div class="symptom-list" id="faqList"></div>
-      <div id="faqResult"></div>`;
-  },
-
-  glosario(){
-    return panelHeader('Módulo','Glosario','Busca un término técnico de velería.') + `
-      <div class="search-wrap"><input id="glossSearch" placeholder="Ej: curado, frosting, pabilo…"></div>
-      <div class="card" id="glossList"></div>`;
-  },
-
-  comparativa(){
-    return panelHeader('Módulo','Cera vegetal vs. mineral vs. gel','Toca un tipo para ver sus fortalezas y en qué usarlo.') + `
-      <div class="chips" id="compareChips"></div>
-      <div id="compareResult"></div>`;
-  },
-
-  conversion(){
-    return panelHeader('Módulo','Conversión de unidades','Elige la conversión y escribe el valor.') + `
-      <div class="chips" id="convChips"></div>
-      <div class="card">
-        <div class="field"><label id="convLabel">Valor</label><input type="number" id="convInput" value="100" step="0.1"></div>
-        <div class="calc-out" style="margin-top:1rem;">
-          <div class="box"><span>Resultado</span><b id="convOut">—</b></div>
-        </div>
-      </div>`;
-  },
-
-  vidautil(){
-    return panelHeader('Módulo','Vida útil y almacenamiento','Toca cada punto para ver el detalle.') + `
-      <div class="chips" id="storageChips"></div>
-      <div id="storageResult"></div>`;
-  },
-
-  quemado(){
-    return panelHeader('Módulo','Tiempo de quemado estimado','Con los gramos y el diámetro, calcula cuántas horas durará encendida.') + `
-      <div class="card">
-        <div class="calc-grid">
-          <div class="field"><label>Gramos de cera</label><input type="number" id="inGrams" value="200" step="5" min="0"></div>
-          <div class="field"><label>Diámetro (cm)</label><input type="number" id="inBurnDiam" value="7" step="0.1" min="0"></div>
-        </div>
-        <div class="calc-out" style="margin-top:1rem;">
-          <div class="box"><span>Duración estimada</span><b id="burnOut">—</b></div>
-        </div>
-      </div>
-      <div class="tip-box" style="margin-top:.9rem;">💡 Es una estimación aproximada (≈3 g de cera por hora por cada cm de diámetro). Consulta el módulo "Curado y prueba de quemado" para hacer tu propia prueba antes de confiar en este número para producir en volumen.</div>`;
-  },
-
-  diario(){
-    return panelHeader('Módulo','Diario de lotes','Registra cada prueba para repetir tus aciertos.') + `
-      <div class="card">
-        <div class="calc-grid">
-          <div class="field"><label>Cera usada</label><input type="text" id="dCera" placeholder="Ej: Soya vaso"></div>
-          <div class="field"><label>% Fragancia</label><input type="number" id="dFrag" placeholder="Ej: 8" step="0.5"></div>
-        </div>
-        <div class="field" style="margin-top:.7rem;"><label>Notas del resultado</label><input type="text" id="dNotas" placeholder="Ej: aroma fuerte, sin frosting"></div>
-        <button id="dAdd" class="btn" style="margin-top:.9rem;">+ Agregar entrada</button>
-      </div>
-      <div id="diarioList" style="margin-top:1rem;"></div>
-      <button id="dExport" class="btn" style="margin-top:.9rem; background:var(--card); color:var(--ink); border:1.5px solid var(--line);">⬇ Descargar registro (.txt)</button>
-      <div class="tip-box" style="margin-top:.9rem;">💡 Este registro vive solo en esta sesión del navegador — descárgalo antes de cerrar la app para no perderlo.</div>`;
-  },
-
-  quiz(){
-    return panelHeader('Módulo','¿Qué vela deberías hacer?','Responde 4 preguntas rápidas y te recomendamos una receta.') + `
-      <div class="card" id="quizCard"></div>`;
-  },
-
-  curso(){
-    return panelHeader('Siguiente paso','Curso Completo de Velas','Esta guía es solo el comienzo. El Curso Completo "Diseña y Crea Velas Artesanales" con la instructora Yuly Rivas te lleva de cero a un catálogo profesional, con 20 módulos, práctica guiada y bonos.') + `
-      <div class="card">
-        <h3 style="font-size:1.15rem;">Temario completo (20 módulos)</h3>
-        <p style="margin-top:.5rem; font-size:.88rem;">Toca el botón para ver todo lo que incluye, módulo por módulo.</p>
-        <button id="toggleTemario" class="btn" style="margin-top:.8rem;">📋 Ver temario completo</button>
-        <div id="temarioBox" style="display:none; margin-top:1rem;"></div>
-      </div>
-      <div class="card" style="margin-top:.9rem; text-align:center;">
-        <h3 style="font-size:1.3rem;">Adquiere el Curso Completo</h3>
-        <p style="margin-top:.4rem;">Acceso a los 20 módulos + bonos + 2 asesorías en vivo al mes.</p>
-        <a href="https://go.hotmart.com/H101329666X?ap=329d" target="_blank" rel="noopener"
-           class="btn btn-primary" style="margin-top:1rem;">
-          🎓 Adquiérelo aquí por $37 USD
-        </a>
-        <p style="margin-top:.8rem; font-size:.72rem; color:var(--ink-soft);">Instructora: Yuly Rivas</p>
-      </div>`;
-  },
-
-  curado(){
-    return panelHeader('Módulo','Curado y prueba de quemado','Los dos pasos que separan una vela casera de una vela profesional.') + `
-      <div class="card">
-        <h3 style="font-size:1.05rem;">¿Por qué importa el curado?</h3>
-        <p style="margin-top:.5rem; font-size:.87rem;">El curado es el tiempo de reposo que le das a la vela después de elaborarla, antes de encenderla o venderla. Durante ese tiempo la fragancia se fija por completo en la estructura de la cera — una vela sin curar suele oler mucho más débil de lo que realmente puede oler.</p>
-      </div>
-      <div class="card" style="margin-top:.9rem;">
-        <h4 style="font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); margin-bottom:.6rem;">Tiempo de curado recomendado</h4>
-        <div class="chips" id="curadoChips"></div>
-        <div id="curadoResult"></div>
-      </div>
-      <div class="card" style="margin-top:.9rem;">
-        <h3 style="font-size:1.05rem;">Cómo hacer una prueba de quemado</h3>
-        <p style="margin-top:.4rem; font-size:.85rem;">Antes de vender o regalar un lote, haz siempre esta prueba completa:</p>
-        <div class="steps" id="burnSteps" style="margin-top:.7rem;"></div>
-      </div>
-      <div class="signs-grid">
-        <div class="signs-box good"><b>✔ Señales de que todo está bien</b><ul>${burnSigns.good.map(s=>`<li>${s}</li>`).join('')}</ul></div>
-        <div class="signs-box bad"><b>⚠ Señales de alerta</b><ul>${burnSigns.bad.map(s=>`<li>${s}</li>`).join('')}</ul></div>
-      </div>`;
-  },
-};
-
-/* ============================================================
-   WIRING (per panel)
-============================================================ */
-function wireAfterRender(id){
-  if(id==='empieza') wireEmpieza();
-  if(id==='recetas') wireRecetas();
-  if(id==='cantidad') wireCantidad();
-  if(id==='cera') wireChips('waxChips', waxTypes, 'name', (item)=>renderResultCard('waxResult', item.ic, item.name, item.best, item.tags, item.notes));
-  if(id==='pabilo') wireWick();
-  if(id==='aromas') wireChips('scentChips', scentFamilies, 'name', (item)=>renderResultCard('scentResult', item.ic, item.name, item.use, [item.ex]));
-  if(id==='color') wireChips('colorChips', colorGuide, 'name', (item)=>renderResultCard('colorResult', item.ic, item.name, item.note, [item.pair]));
-  if(id==='diagnostico') wireDiagnostico();
-  if(id==='precio') wirePrecio();
-  if(id==='kit') wireChecklistPanel('kitList','kitBar','kitCount', startKit);
-  if(id==='plan') wireChecklistPanel('planList','planBar','planCount', plan30);
-  if(id==='seguridad') wireChips('safetyChips', safetyTips, 'name', (item)=>renderResultCard('safetyResult', item.ic, item.name, item.tip, []));
-  if(id==='faq') wireFaq();
-  if(id==='glosario') wireGlossary();
-  if(id==='comparativa') wireChips('compareChips', waxCompare, 'name', (item)=>renderResultCard('compareResult', item.ic, item.name, item.best, [], item.notes));
-  if(id==='conversion') wireConversion();
-  if(id==='vidautil') wireChips('storageChips', storageTips, 'name', (item)=>renderResultCard('storageResult', item.ic, item.name, item.tip, []));
-  if(id==='quemado') wireQuemado();
-  if(id==='diario') wireDiario();
-  if(id==='quiz') wireQuiz();
-  if(id==='curso') wireCurso();
-  if(id==='curado') wireCurado();
-}
-
-/* Generic chip selector -> calls onSelect(item) */
-function wireChips(containerId, items, labelKey, onSelect){
-  const el = document.getElementById(containerId);
-  el.innerHTML = items.map((it,i)=>`<div class="chip" data-i="${i}">${it.ic||''} ${it[labelKey]}</div>`).join('');
-  const chips = el.querySelectorAll('.chip');
-  chips.forEach(c=> c.addEventListener('click', ()=>{
-    chips.forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');
-    onSelect(items[parseInt(c.dataset.i)]);
-  }));
-  chips[0].click();
-}
-
-function renderResultCard(targetId, ic, title, lead, tags=[], notes=[]){
-  document.getElementById(targetId).innerHTML = `
-    <div class="result-card">
-      <div style="font-size:1.6rem;">${ic}</div>
-      <h3>${title}</h3>
-      <p style="margin-top:.3rem;">${lead}</p>
-      ${tags.length?`<div class="result-tags">${tags.map(t=>`<span>${t}</span>`).join('')}</div>`:''}
-      ${notes.length?`<ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>`:''}
-    </div>`;
-}
-
-/* Recetas */
-/* Empieza aquí — ruta sugerida */
-function wireEmpieza(){
-  const route = [
-    {id:"seguridad", ic:"🔥", t:"Lee las 6 reglas de seguridad", s:"Antes de encender nada"},
-    {id:"kit", ic:"✅", t:"Revisa qué materiales tienes", s:"Kit de inicio"},
-    {id:"quiz", ic:"🧭", t:"Descubre qué vela hacer primero", s:"Quiz de 4 preguntas"},
-    {id:"recetas", ic:"🍯", t:"Sigue la receta paso a paso", s:"Recetas guiadas"},
-    {id:"curado", ic:"🔥", t:"Aprende a curarla y probarla", s:"Curado y prueba de quemado"},
-  ];
-  document.getElementById('routeList').innerHTML = route.map((r,i)=>`
-    <button class="route-item" data-id="${r.id}">
-      <div class="num">${i+1}</div>
-      <div class="txt"><b>${r.ic} ${r.t}</b><span>${r.s}</span></div>
-      <div class="arrow">→</div>
-    </button>`).join('');
-  document.querySelectorAll('.route-item').forEach(btn=>
-    btn.addEventListener('click', ()=> openPanel(btn.dataset.id)));
-}
-
-function wireRecetas(){
-  const chipsEl = document.getElementById('recipeChips');
-  const keys = Object.keys(recipes);
-  chipsEl.innerHTML = keys.map((k,i)=>`<div class="chip" data-k="${k}">${recipes[k].label}</div>`).join('');
-  const chips = chipsEl.querySelectorAll('.chip');
-  function show(key){
-    chips.forEach(c=>c.classList.toggle('active', c.dataset.k===key));
-    const r = recipes[key];
-    document.getElementById('recipeCard').innerHTML = `
-      <div class="card">
-        <h3 style="font-size:1.2rem;">${r.title}</h3>
-        <div class="recipe-meta">${r.meta.map(m=>`<span>${m}</span>`).join('')}</div>
-        <div class="cols2">
-          <div>
-            <h4>Ingredientes</h4>
-            <div id="recIng"></div>
-          </div>
-          <div>
-            <h4>Paso a paso</h4>
-            <div class="steps" id="recSteps">${r.steps.map(s=>`<div class="step"><span>${s}</span></div>`).join('')}</div>
-          </div>
-        </div>
-        <div class="tip-box">💡 ${r.tip}</div>
-      </div>`;
-    document.getElementById('recIng').innerHTML = r.ingredients.map(i=>`<label class="check-item"><input type="checkbox"><span>${i}</span></label>`).join('');
-    document.querySelectorAll('#recIng .check-item').forEach(it=>{
-      const cb = it.querySelector('input');
-      cb.addEventListener('change', ()=> it.classList.toggle('done', cb.checked));
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', function() {
+            const answer = this.nextElementSibling;
+            const toggle = this.querySelector('.faq-toggle');
+            
+            // Toggle current
+            answer.classList.toggle('active');
+            toggle.textContent = answer.classList.contains('active') ? '−' : '+';
+            
+            // Close others
+            document.querySelectorAll('.faq-answer.active').forEach(otherAnswer => {
+                if (otherAnswer !== answer) {
+                    otherAnswer.classList.remove('active');
+                    otherAnswer.previousElementSibling.querySelector('.faq-toggle').textContent = '+';
+                }
+            });
+        });
     });
-    document.querySelectorAll('#recSteps .step').forEach(st=> st.addEventListener('click', ()=> st.classList.toggle('done')));
-  }
-  chips.forEach(c=> c.addEventListener('click', ()=> show(c.dataset.k)));
-  show(keys[0]);
-}
-
-/* Wick calculator */
-/* Cantidad de cera */
-function wireCantidad(){
-  let selectedFactor = waxDensity[0].factor;
-  let selectedName = waxDensity[0].name;
-
-  const factorChips = document.getElementById('waxFactorChips');
-  factorChips.innerHTML = waxDensity.map((w,i)=>`<div class="chip ${i===0?'active':''}" data-i="${i}">${w.name}</div>`).join('');
-  const fChips = factorChips.querySelectorAll('.chip');
-  fChips.forEach(c=> c.addEventListener('click', ()=>{
-    fChips.forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');
-    const w = waxDensity[parseInt(c.dataset.i)];
-    selectedFactor = w.factor; selectedName = w.name;
-    calcAgua(); calcGeo();
-  }));
-
-  const methodChips = document.getElementById('methodChips').querySelectorAll('.chip');
-  const aguaBox = document.getElementById('methodAgua');
-  const geoBox = document.getElementById('methodGeo');
-  methodChips.forEach(c=> c.addEventListener('click', ()=>{
-    methodChips.forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');
-    const m = c.dataset.m;
-    aguaBox.style.display = m==='agua' ? 'block' : 'none';
-    geoBox.style.display = m==='geo' ? 'block' : 'none';
-  }));
-
-  function resultHTML(grams, sub){
-    return `
-      <div class="result-card" style="margin-top:1rem;">
-        <div style="font-size:1.5rem;">⚖️</div>
-        <h3 style="font-size:1.3rem;">${grams.toFixed(0)} g de cera de ${selectedName}</h3>
-        <p style="margin-top:.3rem;">${sub}</p>
-        <div class="result-tags"><span>Factor usado: ${selectedFactor} g/mL</span></div>
-      </div>`;
-  }
-
-  function calcAgua(){
-    const water = parseFloat(document.getElementById('inWater').value)||0;
-    const grams = water*selectedFactor;
-    document.getElementById('aguaResult').innerHTML = resultHTML(grams, `Basado en ${water} g de agua medidos en tu recipiente o molde.`);
-  }
-  function calcGeo(){
-    const d = parseFloat(document.getElementById('inDiam').value)||0;
-    const h = parseFloat(document.getElementById('inHeight').value)||0;
-    const r = d/2;
-    const volume = Math.PI*r*r*h; // cm3 = mL
-    const grams = volume*selectedFactor;
-    document.getElementById('geoResult').innerHTML = resultHTML(grams, `Volumen calculado: ${volume.toFixed(0)} mL (diámetro ${d} cm × altura ${h} cm).`);
-  }
-
-  document.getElementById('inWater').addEventListener('input', calcAgua);
-  document.getElementById('inDiam').addEventListener('input', calcGeo);
-  document.getElementById('inHeight').addEventListener('input', calcGeo);
-  calcAgua(); calcGeo();
-}
-
-function wireWick(){
-  const input = document.getElementById('wickDiam');
-  function calc(){
-    const d = parseFloat(input.value)||0;
-    let cat, desc, w;
-    if(d<=6.5){ cat="Delgado"; w="2px"; desc="Un solo pabilo delgado a mediano es suficiente para este diámetro."; }
-    else if(d<=9){ cat="Mediano"; w="3px"; desc="Usa un pabilo mediano. Si el aroma se siente débil, considera uno ligeramente más grueso."; }
-    else { cat="Grueso o doble"; w="4px"; desc="Para este diámetro, usa un pabilo grueso o distribuye 2–3 pabilos equidistantes."; }
-    document.getElementById('wickResult').innerHTML = `
-      <div class="result-card">
-        <div class="wick-visual">
-          <div class="wick-jar" style="--wickw:${w};"></div>
-          <div>
-            <h3 style="font-size:1.1rem;">Pabilo ${cat}</h3>
-            <p style="margin-top:.25rem;">${desc}</p>
-          </div>
-        </div>
-        <div class="tip-box" style="margin-top:1rem;">Esta es una referencia de partida — confirma siempre con una prueba de quemado antes de producir en volumen.</div>
-      </div>`;
-  }
-  input.addEventListener('input', calc);
-  calc();
-}
-
-/* Diagnóstico */
-function wireDiagnostico(){
-  const list = document.getElementById('symptomList');
-  list.innerHTML = faults.map((f,i)=>`<button class="symptom-btn" data-i="${i}">${f.p}</button>`).join('');
-  const btns = list.querySelectorAll('.symptom-btn');
-  function show(i){
-    btns.forEach(b=>b.classList.toggle('active', parseInt(b.dataset.i)===i));
-    const f = faults[i];
-    document.getElementById('diagResult').innerHTML = `
-      <div class="result-card diag-answer">
-        <div class="row"><span class="tagline cause">Causa</span><p>${f.c}</p></div>
-        <div class="row"><span class="tagline sol">Solución</span><p>${f.s}</p></div>
-      </div>`;
-  }
-  btns.forEach(b=> b.addEventListener('click', ()=> show(parseInt(b.dataset.i))));
-  show(0);
-}
-
-/* Precio */
-function wirePrecio(){
-  function calc(){
-    const cost = parseFloat(document.getElementById('inCost').value)||0;
-    const time = parseFloat(document.getElementById('inTime').value)||0;
-    const margin = (parseFloat(document.getElementById('inMargin').value)||0)/100;
-    const units = Math.max(1, parseInt(document.getElementById('inUnits').value)||1);
-    const base = (cost+time)/units;
-    const price = margin<1 ? base/(1-margin) : base;
-    document.getElementById('outPrice').textContent = '$'+price.toFixed(2);
-    document.getElementById('outProfit').textContent = '$'+(price-base).toFixed(2);
-  }
-  ['inCost','inTime','inMargin','inUnits'].forEach(id=> document.getElementById(id).addEventListener('input', calc));
-  calc();
-}
-
-/* Checklist panels (kit / plan) */
-function wireChecklistPanel(listId, barId, countId, items){
-  const listEl = document.getElementById(listId);
-  listEl.innerHTML = items.map(i=>`<label class="check-item"><input type="checkbox"><span>${i}</span></label>`).join('');
-  const cbs = listEl.querySelectorAll('.check-item');
-  const bar = document.getElementById(barId);
-  const count = document.getElementById(countId);
-  function update(){
-    const done = listEl.querySelectorAll('.check-item.done').length;
-    bar.style.width = (done/items.length*100)+'%';
-    count.textContent = done+'/'+items.length;
-  }
-  cbs.forEach(it=>{
-    const cb = it.querySelector('input');
-    cb.addEventListener('change', ()=>{ it.classList.toggle('done', cb.checked); update(); });
-  });
-  update();
-}
-
-/* FAQ */
-function wireFaq(){
-  const list = document.getElementById('faqList');
-  list.innerHTML = faqs.map((f,i)=>`<button class="symptom-btn" data-i="${i}">${f.q}</button>`).join('');
-  const btns = list.querySelectorAll('.symptom-btn');
-  function show(i){
-    btns.forEach(b=>b.classList.toggle('active', parseInt(b.dataset.i)===i));
-    document.getElementById('faqResult').innerHTML = `<div class="result-card"><p>${faqs[i].a}</p></div>`;
-  }
-  btns.forEach(b=> b.addEventListener('click', ()=> show(parseInt(b.dataset.i))));
-  show(0);
-}
-
-/* Glossary */
-function wireGlossary(){
-  const input = document.getElementById('glossSearch');
-  function render(filter=''){
-    const list = glossary.filter(g=> g.t.toLowerCase().includes(filter.toLowerCase()));
-    document.getElementById('glossList').innerHTML = list.length
-      ? list.map(g=>`<div class="gterm"><b>${g.t}</b><p>${g.d}</p></div>`).join('')
-      : `<p>No se encontraron términos.</p>`;
-  }
-  input.addEventListener('input', e=> render(e.target.value));
-  render();
-}
-
-/* Conversión de unidades */
-function wireConversion(){
-  const chipsEl = document.getElementById('convChips');
-  chipsEl.innerHTML = unitConversions.map((c,i)=>`<div class="chip ${i===0?'active':''}" data-i="${i}">${c.from}</div>`).join('');
-  const chips = chipsEl.querySelectorAll('.chip');
-  const input = document.getElementById('convInput');
-  const label = document.getElementById('convLabel');
-  const out = document.getElementById('convOut');
-  let current = unitConversions[0];
-  function calc(){
-    const v = parseFloat(input.value)||0;
-    out.textContent = current.calc(v);
-  }
-  function select(i){
-    chips.forEach(c=>c.classList.toggle('active', parseInt(c.dataset.i)===i));
-    current = unitConversions[i];
-    label.textContent = 'Valor en '+current.unit;
-    calc();
-  }
-  chips.forEach(c=> c.addEventListener('click', ()=> select(parseInt(c.dataset.i))));
-  input.addEventListener('input', calc);
-  select(0);
-}
-
-/* Tiempo de quemado */
-function wireQuemado(){
-  const BURN_RATE = 3; // g por hora por cm de diámetro (estimado)
-  function calc(){
-    const grams = parseFloat(document.getElementById('inGrams').value)||0;
-    const diam = parseFloat(document.getElementById('inBurnDiam').value)||0;
-    const out = document.getElementById('burnOut');
-    if(diam<=0){ out.textContent='—'; return; }
-    const hours = grams/(diam*BURN_RATE);
-    const h = Math.floor(hours);
-    const m = Math.round((hours-h)*60);
-    out.textContent = h+'h '+m+'min';
-  }
-  document.getElementById('inGrams').addEventListener('input', calc);
-  document.getElementById('inBurnDiam').addEventListener('input', calc);
-  calc();
-}
-
-/* Diario de lotes (en memoria — se pierde al recargar, por eso ofrece exportar) */
-let diarioEntries = [];
-function wireDiario(){
-  function render(){
-    const list = document.getElementById('diarioList');
-    if(!diarioEntries.length){
-      list.innerHTML = `<p style="font-size:.85rem; color:var(--ink-soft);">Aún no tienes entradas registradas.</p>`;
-      return;
-    }
-    list.innerHTML = diarioEntries.map((e,i)=>`
-      <div class="card" style="display:flex; justify-content:space-between; align-items:flex-start; gap:.8rem; margin-top:.6rem;">
-        <div>
-          <b style="font-size:.85rem; color:var(--accent-deep);">${e.fecha} · ${e.cera||'—'}</b>
-          <p style="margin-top:.2rem; font-size:.82rem;">Fragancia: ${e.frag||'—'}% · ${e.notas||'Sin notas'}</p>
-        </div>
-        <button data-i="${i}" class="del-entry" style="background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:1rem;">✕</button>
-      </div>`).join('');
-    list.querySelectorAll('.del-entry').forEach(btn=> btn.addEventListener('click', ()=>{
-      diarioEntries.splice(parseInt(btn.dataset.i),1); render();
-    }));
-  }
-  document.getElementById('dAdd').addEventListener('click', ()=>{
-    const cera = document.getElementById('dCera').value.trim();
-    const frag = document.getElementById('dFrag').value.trim();
-    const notas = document.getElementById('dNotas').value.trim();
-    if(!cera && !notas){ return; }
-    diarioEntries.push({fecha:new Date().toLocaleDateString('es-CR'), cera, frag, notas});
-    document.getElementById('dCera').value=''; document.getElementById('dFrag').value=''; document.getElementById('dNotas').value='';
-    render();
-  });
-  document.getElementById('dExport').addEventListener('click', ()=>{
-    const text = diarioEntries.map(e=> `${e.fecha} | Cera: ${e.cera||'—'} | Fragancia: ${e.frag||'—'}% | Notas: ${e.notas||'—'}`).join('\n') || 'Sin entradas registradas.';
-    const blob = new Blob([text], {type:'text/plain'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'diario-de-lotes.txt';
-    a.click();
-  });
-  render();
-}
-
-/* Quiz */
-function wireQuiz(){
-  let step = 0;
-  const totals = {};
-  Object.keys(recipes).forEach(k=> totals[k]=0);
-
-  function renderQuestion(){
-    const card = document.getElementById('quizCard');
-    const q = quizQuestions[step];
-    card.innerHTML = `
-      <div style="font-size:.72rem; color:var(--ink-soft); margin-bottom:.4rem;">Pregunta ${step+1} de ${quizQuestions.length}</div>
-      <h3 style="font-size:1.05rem; margin-bottom:.9rem;">${q.q}</h3>
-      <div class="symptom-list">
-        ${q.options.map((o,i)=>`<button class="symptom-btn" data-i="${i}">${o.t}</button>`).join('')}
-      </div>`;
-    card.querySelectorAll('.symptom-btn').forEach(btn=> btn.addEventListener('click', ()=>{
-      const opt = q.options[parseInt(btn.dataset.i)];
-      Object.keys(opt.score).forEach(k=> totals[k]=(totals[k]||0)+opt.score[k]);
-      step++;
-      if(step<quizQuestions.length) renderQuestion(); else renderResult();
-    }));
-  }
-  function renderResult(){
-    let bestKey = Object.keys(totals)[0];
-    Object.keys(totals).forEach(k=>{ if(totals[k]>totals[bestKey]) bestKey=k; });
-    const r = recipes[bestKey];
-    document.getElementById('quizCard').innerHTML = `
-      <div style="text-align:center;">
-        <div style="font-size:1.8rem;">🕯️</div>
-        <h3 style="font-size:1.2rem; margin-top:.4rem;">Te recomendamos: ${r.title}</h3>
-        <p style="margin-top:.5rem;">Según tus respuestas, esta receta se ajusta mejor a tu nivel y a lo que tienes a mano.</p>
-        <button id="quizGo" class="btn btn-primary" style="margin-top:1rem;">Ver receta →</button>
-      </div>`;
-    document.getElementById('quizGo').addEventListener('click', ()=> openPanel('recetas'));
-  }
-  renderQuestion();
-}
-
-/* Curso completo — CTA final */
-function wireCurso(){
-  const btn = document.getElementById('toggleTemario');
-  const box = document.getElementById('temarioBox');
-  box.innerHTML = temario.map(mod=>`
-    <details class="acc">
-      <summary>${mod.m}</summary>
-      <div class="acc-body"><ul>${mod.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>
-    </details>`).join('') + `
-    <div class="tip-box" style="border-left-color:var(--accent);">🎁 Bono especial: 2 asesorías en vivo al mes para aclarar dudas y preguntas.<br><br>ℹ️ Los módulos 14 al 19 se desbloquean a los 8 días de tu inscripción; el resto de las clases están disponibles desde el primer día. El acompañamiento se da en el grupo de alumnos en Telegram.</div>`;
-  btn.addEventListener('click', ()=>{
-    const open = box.style.display !== 'none';
-    box.style.display = open ? 'none' : 'block';
-    btn.textContent = open ? '📋 Ver temario completo' : '📋 Ocultar temario';
-  });
-}
-
-/* Curado y prueba de quemado */
-function wireCurado(){
-  const chipsEl = document.getElementById('curadoChips');
-  chipsEl.innerHTML = curadoTimes.map((c,i)=>`<div class="chip ${i===0?'active':''}" data-i="${i}">${c.ic} ${c.name}</div>`).join('');
-  const chips = chipsEl.querySelectorAll('.chip');
-  function show(i){
-    chips.forEach(c=>c.classList.toggle('active', parseInt(c.dataset.i)===i));
-    const c = curadoTimes[i];
-    document.getElementById('curadoResult').innerHTML = `
-      <div class="result-card" style="margin-top:.9rem;">
-        <h3 style="font-size:1.1rem;">${c.ic} ${c.name}: ${c.dias}</h3>
-        <p style="margin-top:.3rem;">Deja reposar tu vela este tiempo antes de venderla o regalarla, para que el aroma se fije por completo.</p>
-      </div>`;
-  }
-  chips.forEach(c=> c.addEventListener('click', ()=> show(parseInt(c.dataset.i))));
-  show(0);
-
-  document.getElementById('burnSteps').innerHTML = burnTestSteps.map(s=>`<div class="step"><span>${s}</span></div>`).join('');
-  document.querySelectorAll('#burnSteps .step').forEach(st=> st.addEventListener('click', ()=> st.classList.toggle('done')));
-}
+    
+    // Smooth scroll for anchors
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href !== '#' && document.querySelector(href)) {
+                e.preventDefault();
+                document.querySelector(href).scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
 </script>
+
 </body>
 </html>
